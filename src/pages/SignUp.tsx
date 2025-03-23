@@ -1,18 +1,26 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { signUp, isLoading, user } = useAuth();
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Redirect if already logged in
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
   
   // Password strength indicators
   const hasMinLength = password.length >= 8;
@@ -23,13 +31,7 @@ const SignUp = () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate signup API call
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate("/");
-    }, 1500);
+    await signUp(email, password, name);
   };
   
   return (
@@ -287,6 +289,7 @@ const SignUp = () => {
                   <button
                     type="button"
                     className="w-full inline-flex justify-center py-3 px-4 border border-peerly-200 rounded-lg bg-white text-sm font-medium text-peerly-700 hover:bg-peerly-50 transition-colors"
+                    onClick={() => alert("Google Sign-up will be implemented in future updates")}
                   >
                     <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.66 15.63 16.88 16.79 15.68 17.56V20.13H19.22C21.19 18.31 22.56 15.57 22.56 12.25Z" fill="#4285F4"/>
@@ -300,6 +303,7 @@ const SignUp = () => {
                   <button
                     type="button"
                     className="w-full inline-flex justify-center py-3 px-4 border border-peerly-200 rounded-lg bg-white text-sm font-medium text-peerly-700 hover:bg-peerly-50 transition-colors"
+                    onClick={() => alert("Facebook Sign-up will be implemented in future updates")}
                   >
                     <svg className="h-5 w-5 mr-2 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />

@@ -1,12 +1,15 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Upload, X, Info, Plus, Camera, MapPin, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 // Categories to choose from
 const categories = [
@@ -30,6 +33,7 @@ const pricingOptions = [
 
 const CreateListing = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   // Form state
   const [step, setStep] = useState(1);
@@ -89,16 +93,88 @@ const CreateListing = () => {
     }
   };
   
+  // File upload
+  const uploadImages = async (): Promise<string[]> => {
+    const uploadedUrls: string[] = [];
+    
+    for (const image of images) {
+      if (image.file) {
+        const fileExt = image.file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}-${Date.now()}.${fileExt}`;
+        const filePath = `${user?.id}/${fileName}`;
+        
+        const { data, error } = await supabase.storage
+          .from('listings')
+          .upload(filePath, image.file);
+          
+        if (error) {
+          console.error('Error uploading image:', error);
+          toast({
+            title: "Upload failed",
+            description: error.message,
+            variant: "destructive",
+          });
+          continue;
+        }
+        
+        // Get public URL for the uploaded file
+        const { data: { publicUrl } } = supabase.storage
+          .from('listings')
+          .getPublicUrl(filePath);
+          
+        uploadedUrls.push(publicUrl);
+      }
+    }
+    
+    return uploadedUrls;
+  };
+  
   // Form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Upload images first
+      const imageUrls = await uploadImages();
+      
+      // Then save listing data
+      const { data, error } = await supabase
+        .from('listings')
+        .insert({
+          owner_id: user?.id,
+          title,
+          description,
+          category,
+          price: parseFloat(price),
+          deposit: deposit ? parseFloat(deposit) : null,
+          location: address,
+          image_urls: imageUrls,
+        })
+        .select();
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Listing created!",
+        description: "Your item has been successfully listed for rent.",
+      });
+      
+      // Navigate to the newly created listing
+      if (data && data[0]?.id) {
+        navigate(`/item/${data[0].id}`);
+      } else {
+        navigate("/");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error creating listing",
+        description: error.message,
+        variant: "destructive",
+      });
+      console.error('Error creating listing:', error);
       setIsLoading(false);
-      navigate("/");
-    }, 2000);
+    }
   };
   
   return (
