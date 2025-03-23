@@ -20,6 +20,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import UserMenu from "./UserMenu";
+import CartButton from "./CartButton";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   NavigationMenu,
@@ -193,6 +194,7 @@ const Navbar = () => {
               </>
             )}
             
+            <CartButton />
             <UserMenu />
           </div>
           
@@ -209,6 +211,7 @@ const Navbar = () => {
               />
             </form>
             
+            <CartButton />
             <UserMenu />
             
             <button 
