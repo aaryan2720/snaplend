@@ -23,7 +23,13 @@ export interface ListingProps {
   featured?: boolean;
 }
 
-const ListingCard = ({ listing, className }: { listing: ListingProps; className?: string }) => {
+interface ListingCardProps {
+  listing: ListingProps;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+const ListingCard = ({ listing, className, style }: ListingCardProps) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
@@ -44,6 +50,7 @@ const ListingCard = ({ listing, className }: { listing: ListingProps; className?
         listing.featured && "ring-2 ring-primary/20",
         className
       )}
+      style={style}
       onClick={() => navigate(`/item/${listing.id}`)}
     >
       {/* Image */}
