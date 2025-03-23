@@ -1,11 +1,10 @@
 
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Container } from "@/components/ui/container";
 import { useAuth } from "@/contexts/AuthContext";
+import { ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -36,7 +35,7 @@ const Login = () => {
               to="/" 
               className="text-2xl font-display font-semibold text-peerly-900"
             >
-              peerly
+              Snaplend
             </Link>
             
             <Link
