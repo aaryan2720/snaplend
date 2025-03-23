@@ -17,7 +17,8 @@ import {
   Upload,
   Camera,
   Clipboard,
-  X
+  X,
+  Star  // Added Star import here
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";

@@ -87,7 +87,7 @@ const recommendedItems: ListingProps[] = [
     title: "Camping Gear Complete Set",
     description: "Complete camping set with tent, sleeping bags, portable stove, and more for your next outdoor adventure.",
     price: 700,
-    priceUnit: "weekend",
+    priceUnit: "week", // Changed from "weekend" to "week" to match the allowed types
     location: "Electronic City, Bangalore",
     distance: "12.4 km",
     rating: 4.8,
