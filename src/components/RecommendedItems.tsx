@@ -160,13 +160,15 @@ const RecommendedItems = () => {
         </div>
         
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, index) => (
-              <CarouselItem key={index}>
-                <RecommendationSkeleton />
-              </CarouselItem>
-            ))}
-          </div>
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {[...Array(4)].map((_, index) => (
+                <CarouselItem key={index} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                  <RecommendationSkeleton />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         ) : error ? (
           <div className="text-center p-8 bg-red-50 rounded-lg">
             <p className="text-red-500">
