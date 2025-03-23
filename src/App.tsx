@@ -12,6 +12,10 @@ import SignUp from "./pages/SignUp";
 import CreateListing from "./pages/CreateListing";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Explore from "./pages/Explore";
+import CategoryPage from "./pages/CategoryPage";
+import UserProfile from "./pages/UserProfile";
+import AgreementPage from "./pages/AgreementPage";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +25,18 @@ const AppRoutes = () => (
     <Route path="/item/:id" element={<ItemDetail />} />
     <Route path="/login" element={<Login />} />
     <Route path="/signup" element={<SignUp />} />
+    <Route path="/explore" element={<Explore />} />
+    <Route path="/browse/:category" element={<CategoryPage />} />
+    <Route path="/profile" element={
+      <ProtectedRoute>
+        <UserProfile />
+      </ProtectedRoute>
+    } />
+    <Route path="/agreement/:id" element={
+      <ProtectedRoute>
+        <AgreementPage />
+      </ProtectedRoute>
+    } />
     <Route 
       path="/create-listing" 
       element={
