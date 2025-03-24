@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Star, Heart, MapPin, Calendar, User, ExternalLink, Plus, ChevronRight } from "lucide-react";
@@ -27,13 +28,16 @@ export interface ListingProps {
   reviewCount: number;
   image: string;
   owner: Owner;
+  featured?: boolean; // Added featured property as optional
 }
 
 interface ListingCardProps {
   listing: ListingProps;
+  className?: string; // Added className property to allow styling from parent
+  style?: React.CSSProperties; // Added style property for animation delays
 }
 
-const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
+const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) => {
   const { addToCart } = useCart();
   const [isLiked, setIsLiked] = useState(false);
   const [ref, inView] = useInView({
@@ -67,7 +71,8 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="group h-full flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white hover:shadow-lg transition-all duration-300"
+      className={`group h-full flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white hover:shadow-lg transition-all duration-300 ${className || ""}`}
+      style={style}
     >
       {/* Image Container */}
       <Link to={`/item/${listing.id}`} className="relative pt-[75%] bg-gray-100 overflow-hidden">
@@ -100,6 +105,13 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
             />
           </motion.button>
         </div>
+        
+        {/* Featured badge */}
+        {listing.featured && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold shadow-md">
+            Featured
+          </div>
+        )}
         
         {/* Owner badge */}
         <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm flex items-center">

@@ -1,12 +1,12 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Container } from "@/components/ui/container";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, CreditCard, Landmark, Truck } from "lucide-react";
+import { ArrowLeft, CreditCard, Landmark, Truck, ChevronRight } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,9 +21,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// Define form schema
+const shippingSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  address: z.string().min(5, "Address must be at least 5 characters"),
+  city: z.string().min(2, "City must be at least 2 characters"),
+  state: z.string().min(2, "Please select a state"),
+  pincode: z.string().regex(/^\d{6}$/, "PIN code must be 6 digits"),
+  phone: z.string().regex(/^(\+91)?[0-9]{10}$/, "Enter a valid phone number"),
+});
+
+type ShippingFormValues = z.infer<typeof shippingSchema>;
 
 const Checkout = () => {
   const { cartItems, getCartTotal } = useCart();
+  const navigate = useNavigate();
+  
+  // Form setup
+  const form = useForm<ShippingFormValues>({
+    resolver: zodResolver(shippingSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+      phone: "",
+    },
+  });
+  
+  const onSubmit = (data: ShippingFormValues) => {
+    // Proceed to payment with the shipping data
+    navigate("/checkout/payment", { state: { shippingDetails: data } });
+  };
   
   if (cartItems.length === 0) {
     return (
@@ -55,120 +99,144 @@ const Checkout = () => {
           <div>
             <h1 className="text-2xl font-bold mb-6">Checkout</h1>
             
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Truck className="mr-2 h-5 w-5" />
-                  Shipping Information
-                </CardTitle>
-                <CardDescription>
-                  Enter your shipping details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium mb-1">
-                      First Name
-                    </label>
-                    <Input id="firstName" placeholder="John" />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium mb-1">
-                      Last Name
-                    </label>
-                    <Input id="lastName" placeholder="Doe" />
-                  </div>
-                </div>
-                
-                <div>
-                  <label htmlFor="address" className="block text-sm font-medium mb-1">
-                    Address
-                  </label>
-                  <Input id="address" placeholder="123 Main St" />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label htmlFor="city" className="block text-sm font-medium mb-1">
-                      City
-                    </label>
-                    <Input id="city" placeholder="Bangalore" />
-                  </div>
-                  <div>
-                    <label htmlFor="state" className="block text-sm font-medium mb-1">
-                      State
-                    </label>
-                    <Select>
-                      <SelectTrigger id="state">
-                        <SelectValue placeholder="Select state" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ka">Karnataka</SelectItem>
-                        <SelectItem value="mh">Maharashtra</SelectItem>
-                        <SelectItem value="tn">Tamil Nadu</SelectItem>
-                        <SelectItem value="dl">Delhi</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label htmlFor="pincode" className="block text-sm font-medium mb-1">
-                      PIN Code
-                    </label>
-                    <Input id="pincode" placeholder="560001" />
-                  </div>
-                </div>
-                
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium mb-1">
-                    Phone
-                  </label>
-                  <Input id="phone" placeholder="+91 9876543210" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Payment Information
-                </CardTitle>
-                <CardDescription>
-                  Enter your payment details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label htmlFor="cardName" className="block text-sm font-medium mb-1">
-                    Name on Card
-                  </label>
-                  <Input id="cardName" placeholder="John Doe" />
-                </div>
-                
-                <div>
-                  <label htmlFor="cardNumber" className="block text-sm font-medium mb-1">
-                    Card Number
-                  </label>
-                  <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="expiryDate" className="block text-sm font-medium mb-1">
-                      Expiry Date
-                    </label>
-                    <Input id="expiryDate" placeholder="MM/YY" />
-                  </div>
-                  <div>
-                    <label htmlFor="cvv" className="block text-sm font-medium mb-1">
-                      CVV
-                    </label>
-                    <Input id="cvv" placeholder="123" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <Truck className="mr-2 h-5 w-5" />
+                      Shipping Information
+                    </CardTitle>
+                    <CardDescription>
+                      Enter your shipping details
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="John" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Doe" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="123 Main St" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Bangalore" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <Select 
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select state" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="ka">Karnataka</SelectItem>
+                                <SelectItem value="mh">Maharashtra</SelectItem>
+                                <SelectItem value="tn">Tamil Nadu</SelectItem>
+                                <SelectItem value="dl">Delhi</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="pincode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>PIN Code</FormLabel>
+                            <FormControl>
+                              <Input placeholder="560001" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl>
+                            <Input placeholder="+91 9876543210" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="pt-4">
+                      <Button type="submit" className="w-full flex items-center justify-center">
+                        Proceed to Payment
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </form>
+            </Form>
           </div>
         </div>
         
@@ -220,8 +288,6 @@ const Checkout = () => {
                 <span>Total</span>
                 <span>₹{getCartTotal() + 49 + Math.round(getCartTotal() * 0.18)}</span>
               </div>
-              
-              <Button className="w-full mt-6">Place Order</Button>
             </CardContent>
           </Card>
         </div>
