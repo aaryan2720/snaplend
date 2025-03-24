@@ -49,10 +49,10 @@ const UserMenu = () => {
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="flex items-center p-1.5 bg-white rounded-full border border-peerly-200 hover:bg-peerly-50"
+          className="flex items-center p-1.5 bg-white rounded-full border border-snaplend-200 hover:bg-snaplend-50"
         >
           <div className="flex items-center pr-1">
-            <div className="w-8 h-8 rounded-full bg-peerly-200 flex items-center justify-center overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-snaplend-200 flex items-center justify-center overflow-hidden">
               {profile?.avatar_url ? (
                 <img 
                   src={profile.avatar_url} 
@@ -60,10 +60,10 @@ const UserMenu = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <UserIcon size={16} className="text-peerly-400" />
+                <UserIcon size={16} className="text-snaplend-400" />
               )}
             </div>
-            <ChevronDown size={14} className="ml-1 text-peerly-400" />
+            <ChevronDown size={14} className="ml-1 text-snaplend-400" />
           </div>
         </Button>
       </DropdownMenuTrigger>

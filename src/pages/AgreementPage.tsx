@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -18,7 +17,7 @@ import {
   Camera,
   Clipboard,
   X,
-  Star  // Added Star import here
+  Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
@@ -105,13 +104,13 @@ const AgreementPage = () => {
           {/* Back button */}
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center text-peerly-600 hover:text-peerly-900 mb-6 transition-colors"
+            className="flex items-center text-snaplend-600 hover:text-snaplend-900 mb-6 transition-colors"
           >
             <ArrowLeft size={18} className="mr-2" />
             Back to item
           </button>
           
-          <h1 className="text-2xl md:text-3xl font-display font-semibold text-peerly-900 mb-6">
+          <h1 className="text-2xl md:text-3xl font-display font-semibold text-snaplend-900 mb-6">
             Rental Agreement
           </h1>
           
@@ -136,22 +135,22 @@ const AgreementPage = () => {
                     </p>
                     
                     <div className="bg-white rounded-lg p-4 border border-green-200">
-                      <h3 className="font-medium text-peerly-900 mb-2">Rental Details</h3>
+                      <h3 className="font-medium text-snaplend-900 mb-2">Rental Details</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-peerly-500">Rental Period</p>
+                          <p className="text-sm text-snaplend-500">Rental Period</p>
                           <p className="font-medium">{startDate} to {endDate} ({rentalDays} days)</p>
                         </div>
                         <div>
-                          <p className="text-sm text-peerly-500">Total Amount</p>
+                          <p className="text-sm text-snaplend-500">Total Amount</p>
                           <p className="font-medium">₹{total}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-peerly-500">Delivery Option</p>
+                          <p className="text-sm text-snaplend-500">Delivery Option</p>
                           <p className="font-medium capitalize">{deliveryOption}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-peerly-500">Security Deposit</p>
+                          <p className="text-sm text-snaplend-500">Security Deposit</p>
                           <p className="font-medium">₹{listing.deposit} (refundable)</p>
                         </div>
                       </div>
@@ -196,13 +195,13 @@ const AgreementPage = () => {
               <div className="lg:col-span-2">
                 <Card>
                   <CardHeader>
-                    <h2 className="text-xl font-semibold text-peerly-900">Request to Rent</h2>
-                    <p className="text-peerly-600">Complete this form to request this item from the owner</p>
+                    <h2 className="text-xl font-semibold text-snaplend-900">Request to Rent</h2>
+                    <p className="text-snaplend-600">Complete this form to request this item from the owner</p>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Item information */}
-                      <div className="flex items-center space-x-4 p-4 bg-peerly-50 rounded-lg">
+                      <div className="flex items-center space-x-4 p-4 bg-snaplend-50 rounded-lg">
                         <div className="w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
                           <img 
                             src={listing.image} 
@@ -211,8 +210,8 @@ const AgreementPage = () => {
                           />
                         </div>
                         <div>
-                          <h3 className="font-medium text-peerly-900">{listing.title}</h3>
-                          <div className="flex items-center text-sm text-peerly-600 mt-1">
+                          <h3 className="font-medium text-snaplend-900">{listing.title}</h3>
+                          <div className="flex items-center text-sm text-snaplend-600 mt-1">
                             <MapPin size={14} className="mr-1" />
                             {listing.location}
                           </div>
@@ -224,29 +223,29 @@ const AgreementPage = () => {
                       
                       {/* Rental dates */}
                       <div>
-                        <h3 className="font-medium text-peerly-900 mb-3 flex items-center">
+                        <h3 className="font-medium text-snaplend-900 mb-3 flex items-center">
                           <Calendar size={18} className="mr-2 text-primary" />
                           Rental Dates
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-peerly-700 mb-1">Start Date</label>
+                            <label className="block text-sm font-medium text-snaplend-700 mb-1">Start Date</label>
                             <input
                               type="date"
                               value={startDate}
                               onChange={(e) => setStartDate(e.target.value)}
-                              className="w-full px-3 py-2 border border-peerly-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                              className="w-full px-3 py-2 border border-snaplend-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                               min={new Date().toISOString().split('T')[0]}
                               required
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-peerly-700 mb-1">End Date</label>
+                            <label className="block text-sm font-medium text-snaplend-700 mb-1">End Date</label>
                             <input
                               type="date"
                               value={endDate}
                               onChange={(e) => setEndDate(e.target.value)}
-                              className="w-full px-3 py-2 border border-peerly-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                              className="w-full px-3 py-2 border border-snaplend-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                               min={startDate || new Date().toISOString().split('T')[0]}
                               required
                             />
@@ -256,7 +255,7 @@ const AgreementPage = () => {
                       
                       {/* Delivery options */}
                       <div>
-                        <h3 className="font-medium text-peerly-900 mb-3 flex items-center">
+                        <h3 className="font-medium text-snaplend-900 mb-3 flex items-center">
                           <MapPin size={18} className="mr-2 text-primary" />
                           Delivery Options
                         </h3>
@@ -270,7 +269,7 @@ const AgreementPage = () => {
                               onChange={() => setDeliveryOption("pickup")}
                               className="mr-2"
                             />
-                            <label htmlFor="pickup" className="text-peerly-700">
+                            <label htmlFor="pickup" className="text-snaplend-700">
                               <span className="font-medium">Self Pickup</span> - Collect and return the item yourself (Free)
                             </label>
                           </div>
@@ -283,7 +282,7 @@ const AgreementPage = () => {
                               onChange={() => setDeliveryOption("delivery")}
                               className="mr-2"
                             />
-                            <label htmlFor="delivery" className="text-peerly-700">
+                            <label htmlFor="delivery" className="text-snaplend-700">
                               <span className="font-medium">Home Delivery</span> - Get the item delivered to your location (₹200)
                             </label>
                           </div>
@@ -292,23 +291,23 @@ const AgreementPage = () => {
                       
                       {/* Message to owner */}
                       <div>
-                        <h3 className="font-medium text-peerly-900 mb-3 flex items-center">
+                        <h3 className="font-medium text-snaplend-900 mb-3 flex items-center">
                           <FileText size={18} className="mr-2 text-primary" />
                           Message to Owner
                         </h3>
                         <textarea
                           placeholder="Introduce yourself and tell the owner what you'll be using the item for..."
-                          className="w-full px-3 py-2 border border-peerly-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary h-24"
+                          className="w-full px-3 py-2 border border-snaplend-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary h-24"
                         ></textarea>
                       </div>
                       
                       {/* Rental agreement */}
-                      <div className="border border-peerly-200 rounded-lg p-4">
-                        <h3 className="font-medium text-peerly-900 mb-3 flex items-center">
+                      <div className="border border-snaplend-200 rounded-lg p-4">
+                        <h3 className="font-medium text-snaplend-900 mb-3 flex items-center">
                           <Clipboard size={18} className="mr-2 text-primary" />
                           Rental Agreement
                         </h3>
-                        <div className="space-y-4 text-sm text-peerly-700">
+                        <div className="space-y-4 text-sm text-snaplend-700">
                           <p>
                             By proceeding with this rental, you agree to the following terms:
                           </p>
@@ -328,7 +327,7 @@ const AgreementPage = () => {
                               className="mt-1 mr-2"
                               required
                             />
-                            <label htmlFor="agreeTerms" className="text-peerly-700">
+                            <label htmlFor="agreeTerms" className="text-snaplend-700">
                               I agree to the rental terms, cancellation policy, and <a href="#" className="text-primary hover:underline">terms of service</a>
                             </label>
                           </div>
@@ -348,7 +347,7 @@ const AgreementPage = () => {
                 <div className="sticky top-28">
                   <Card>
                     <CardHeader>
-                      <h3 className="font-semibold text-peerly-900">Rental Summary</h3>
+                      <h3 className="font-semibold text-snaplend-900">Rental Summary</h3>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {/* Price calculation */}
@@ -356,20 +355,20 @@ const AgreementPage = () => {
                         {rentalDays > 0 && (
                           <>
                             <div className="flex justify-between">
-                              <span className="text-peerly-600">₹{listing.price} x {rentalDays} {rentalDays === 1 ? 'day' : 'days'}</span>
-                              <span className="text-peerly-900">₹{subtotal}</span>
+                              <span className="text-snaplend-600">₹{listing.price} x {rentalDays} {rentalDays === 1 ? 'day' : 'days'}</span>
+                              <span className="text-snaplend-900">₹{subtotal}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-peerly-600">Service fee</span>
-                              <span className="text-peerly-900">₹{serviceFee}</span>
+                              <span className="text-snaplend-600">Service fee</span>
+                              <span className="text-snaplend-900">₹{serviceFee}</span>
                             </div>
                             {deliveryOption === "delivery" && (
                               <div className="flex justify-between">
-                                <span className="text-peerly-600">Delivery fee</span>
-                                <span className="text-peerly-900">₹{deliveryFee}</span>
+                                <span className="text-snaplend-600">Delivery fee</span>
+                                <span className="text-snaplend-900">₹{deliveryFee}</span>
                               </div>
                             )}
-                            <div className="flex justify-between pt-2 border-t border-peerly-100 font-semibold">
+                            <div className="flex justify-between pt-2 border-t border-snaplend-100 font-semibold">
                               <span>Total</span>
                               <span>₹{total}</span>
                             </div>
@@ -377,29 +376,29 @@ const AgreementPage = () => {
                         )}
                         
                         {listing.deposit && (
-                          <div className="flex justify-between pt-2 border-t border-peerly-100 mt-2">
+                          <div className="flex justify-between pt-2 border-t border-snaplend-100 mt-2">
                             <div className="flex items-center">
-                              <span className="text-peerly-600">Security deposit</span>
+                              <span className="text-snaplend-600">Security deposit</span>
                               <div className="ml-1 relative group">
-                                <Info size={14} className="text-peerly-400 cursor-help" />
-                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-white rounded shadow-md text-xs text-peerly-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
+                                <Info size={14} className="text-snaplend-400 cursor-help" />
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-white rounded shadow-md text-xs text-snaplend-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
                                   This deposit will be fully refunded when the item is returned in its original condition.
                                 </div>
                               </div>
                             </div>
-                            <span className="text-peerly-900">₹{listing.deposit}</span>
+                            <span className="text-snaplend-900">₹{listing.deposit}</span>
                           </div>
                         )}
                         
                         {rentalDays === 0 && (
-                          <div className="text-peerly-500 text-sm italic">
+                          <div className="text-snaplend-500 text-sm italic">
                             Select rental dates to view pricing details
                           </div>
                         )}
                       </div>
                       
                       {/* Payment info */}
-                      <div className="bg-peerly-50 p-3 rounded text-sm text-peerly-600">
+                      <div className="bg-snaplend-50 p-3 rounded text-sm text-snaplend-600">
                         <p className="flex items-start">
                           <BadgeDollarSign size={16} className="mr-2 text-primary mt-0.5 flex-shrink-0" />
                           Payment will be collected after the owner accepts your request
@@ -407,9 +406,9 @@ const AgreementPage = () => {
                       </div>
                       
                       {/* Security note */}
-                      <div className="flex items-center justify-center text-sm text-center text-peerly-500 pt-3 border-t border-peerly-100">
+                      <div className="flex items-center justify-center text-sm text-center text-snaplend-500 pt-3 border-t border-snaplend-100">
                         <Shield size={14} className="mr-1" />
-                        <span>Secure rental agreement protected by Peerly</span>
+                        <span>Secure rental agreement protected by SnapLend</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -417,7 +416,7 @@ const AgreementPage = () => {
                   {/* Owner info */}
                   <Card className="mt-4">
                     <CardHeader className="pb-3">
-                      <h3 className="font-semibold text-peerly-900">About the Owner</h3>
+                      <h3 className="font-semibold text-snaplend-900">About the Owner</h3>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center">
@@ -430,7 +429,7 @@ const AgreementPage = () => {
                         </div>
                         <div>
                           <div className="flex items-center">
-                            <h4 className="font-medium text-peerly-900">{listing.owner.name}</h4>
+                            <h4 className="font-medium text-snaplend-900">{listing.owner.name}</h4>
                             {listing.owner.verified && (
                               <div className="ml-2 bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded-full flex items-center">
                                 <Check size={12} className="mr-1" />
@@ -438,7 +437,7 @@ const AgreementPage = () => {
                               </div>
                             )}
                           </div>
-                          <div className="flex items-center text-sm text-peerly-500">
+                          <div className="flex items-center text-sm text-snaplend-500">
                             <span className="flex items-center">
                               <Star size={14} className="text-yellow-400 fill-yellow-400 mr-1" />
                               {listing.owner.rating}

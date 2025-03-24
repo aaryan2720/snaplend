@@ -183,12 +183,12 @@ const CreateListing = () => {
       <main className="flex-1 pt-20 pb-16">
         <Container className="max-w-screen-md">
           <div className="mb-8 flex items-center justify-between">
-            <h1 className="text-3xl font-display font-semibold text-peerly-900">
+            <h1 className="text-3xl font-display font-semibold text-snaplend-900">
               List your item for rent
             </h1>
             <Link
               to="/"
-              className="flex items-center text-peerly-600 hover:text-peerly-900 transition-colors"
+              className="flex items-center text-snaplend-600 hover:text-snaplend-900 transition-colors"
             >
               <ArrowLeft size={18} className="mr-2" />
               Cancel
@@ -210,7 +210,7 @@ const CreateListing = () => {
                         ? "bg-primary text-white"
                         : step === index + 1
                           ? "bg-primary/10 text-primary border-2 border-primary"
-                          : "bg-peerly-100 text-peerly-400 border-2 border-peerly-200"
+                          : "bg-snaplend-100 text-snaplend-400 border-2 border-snaplend-200"
                     )}
                     onClick={() => index + 1 < step && setStep(index + 1)}
                     disabled={index + 1 > step}
@@ -222,7 +222,7 @@ const CreateListing = () => {
                     <div 
                       className={cn(
                         "absolute h-0.5 inset-x-0 top-1/2 transform -translate-y-1/2 mx-5",
-                        step > index + 1 ? "bg-primary" : "bg-peerly-200"
+                        step > index + 1 ? "bg-primary" : "bg-snaplend-200"
                       )}
                     ></div>
                   )}
@@ -233,19 +233,19 @@ const CreateListing = () => {
             <div className="flex justify-between mt-2 px-2">
               <div className={cn(
                 "text-sm font-medium transition-colors",
-                step >= 1 ? "text-primary" : "text-peerly-400"
+                step >= 1 ? "text-primary" : "text-snaplend-400"
               )}>
                 Item Details
               </div>
               <div className={cn(
                 "text-sm font-medium transition-colors",
-                step >= 2 ? "text-primary" : "text-peerly-400"
+                step >= 2 ? "text-primary" : "text-snaplend-400"
               )}>
                 Photos
               </div>
               <div className={cn(
                 "text-sm font-medium transition-colors",
-                step >= 3 ? "text-primary" : "text-peerly-400"
+                step >= 3 ? "text-primary" : "text-snaplend-400"
               )}>
                 Location & Pricing
               </div>
@@ -257,13 +257,13 @@ const CreateListing = () => {
               {/* Step 1: Item Details */}
               {step === 1 && (
                 <div className="animate-fade-up">
-                  <h2 className="text-xl font-medium text-peerly-900 mb-6">
+                  <h2 className="text-xl font-medium text-snaplend-900 mb-6">
                     Tell us about your item
                   </h2>
                   
                   {/* Title */}
                   <div className="mb-6">
-                    <label htmlFor="title" className="block text-sm font-medium text-peerly-700 mb-1">
+                    <label htmlFor="title" className="block text-sm font-medium text-snaplend-700 mb-1">
                       Title <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -272,17 +272,17 @@ const CreateListing = () => {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder="e.g., Professional DSLR Camera Kit"
-                      className="w-full px-4 py-3 border border-peerly-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                      className="w-full px-4 py-3 border border-snaplend-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                       required
                     />
-                    <p className="mt-1 text-sm text-peerly-500">
+                    <p className="mt-1 text-sm text-snaplend-500">
                       Be clear and descriptive about what you're offering.
                     </p>
                   </div>
                   
                   {/* Description */}
                   <div className="mb-6">
-                    <label htmlFor="description" className="block text-sm font-medium text-peerly-700 mb-1">
+                    <label htmlFor="description" className="block text-sm font-medium text-snaplend-700 mb-1">
                       Description <span className="text-red-500">*</span>
                     </label>
                     <textarea
@@ -290,18 +290,18 @@ const CreateListing = () => {
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Describe your item in detail, including its condition, features, and any usage instructions."
-                      className="w-full px-4 py-3 border border-peerly-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                      className="w-full px-4 py-3 border border-snaplend-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                       rows={5}
                       required
                     />
-                    <p className="mt-1 text-sm text-peerly-500">
+                    <p className="mt-1 text-sm text-snaplend-500">
                       Detailed descriptions help renters know exactly what they're getting.
                     </p>
                   </div>
                   
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-medium text-peerly-700 mb-1">
+                    <label className="block text-sm font-medium text-snaplend-700 mb-1">
                       Category <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -313,7 +313,7 @@ const CreateListing = () => {
                             "flex flex-col items-center p-4 rounded-lg border transition-colors",
                             category === cat.id
                               ? "border-primary bg-primary/5 text-primary"
-                              : "border-peerly-200 hover:bg-peerly-50 text-peerly-700"
+                              : "border-snaplend-200 hover:bg-snaplend-50 text-snaplend-700"
                           )}
                           onClick={() => setCategory(cat.id)}
                         >
@@ -329,11 +329,11 @@ const CreateListing = () => {
               {/* Step 2: Photos */}
               {step === 2 && (
                 <div className="animate-fade-up">
-                  <h2 className="text-xl font-medium text-peerly-900 mb-6">
+                  <h2 className="text-xl font-medium text-snaplend-900 mb-6">
                     Add photos of your item
                   </h2>
                   
-                  <p className="mb-6 text-peerly-600">
+                  <p className="mb-6 text-snaplend-600">
                     High-quality photos help your listing stand out. Add at least one photo, but we recommend 4-6 for the best results.
                   </p>
                   
@@ -341,7 +341,7 @@ const CreateListing = () => {
                     {images.map((img) => (
                       <div 
                         key={img.id} 
-                        className="relative aspect-square rounded-lg overflow-hidden border border-peerly-200"
+                        className="relative aspect-square rounded-lg overflow-hidden border border-snaplend-200"
                       >
                         {img.preview ? (
                           <>
@@ -355,13 +355,13 @@ const CreateListing = () => {
                               className="absolute top-2 right-2 p-1 bg-white/80 rounded-full hover:bg-white"
                               onClick={() => removeImage(img.id)}
                             >
-                              <X size={16} className="text-peerly-700" />
+                              <X size={16} className="text-snaplend-700" />
                             </button>
                           </>
                         ) : (
-                          <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-peerly-50 transition-colors">
-                            <Upload size={24} className="text-peerly-400 mb-2" />
-                            <span className="text-xs text-peerly-500">Upload image</span>
+                          <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-snaplend-50 transition-colors">
+                            <Upload size={24} className="text-snaplend-400 mb-2" />
+                            <span className="text-xs text-snaplend-500">Upload image</span>
                             <input
                               type="file"
                               className="hidden"
@@ -377,10 +377,10 @@ const CreateListing = () => {
                       <button
                         type="button"
                         onClick={addImageSlot}
-                        className="aspect-square rounded-lg border border-dashed border-peerly-300 flex flex-col items-center justify-center hover:bg-peerly-50 transition-colors"
+                        className="aspect-square rounded-lg border border-dashed border-snaplend-300 flex flex-col items-center justify-center hover:bg-snaplend-50 transition-colors"
                       >
-                        <Plus size={24} className="text-peerly-400 mb-2" />
-                        <span className="text-sm text-peerly-500">Add photo</span>
+                        <Plus size={24} className="text-snaplend-400 mb-2" />
+                        <span className="text-sm text-snaplend-500">Add photo</span>
                       </button>
                     )}
                   </div>
@@ -405,13 +405,13 @@ const CreateListing = () => {
               {/* Step 3: Location & Pricing */}
               {step === 3 && (
                 <div className="animate-fade-up">
-                  <h2 className="text-xl font-medium text-peerly-900 mb-6">
+                  <h2 className="text-xl font-medium text-snaplend-900 mb-6">
                     Set your location and pricing
                   </h2>
                   
                   {/* Location */}
                   <div className="mb-6">
-                    <label htmlFor="address" className="block text-sm font-medium text-peerly-700 mb-1">
+                    <label htmlFor="address" className="block text-sm font-medium text-snaplend-700 mb-1">
                       Pickup location <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -421,12 +421,12 @@ const CreateListing = () => {
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         placeholder="e.g., Indiranagar, Bangalore"
-                        className="w-full pl-10 pr-4 py-3 border border-peerly-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                        className="w-full pl-10 pr-4 py-3 border border-snaplend-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                         required
                       />
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-peerly-400" size={18} />
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-snaplend-400" size={18} />
                     </div>
-                    <p className="mt-1 text-sm text-peerly-500">
+                    <p className="mt-1 text-sm text-snaplend-500">
                       We'll only show your general area until a booking is confirmed.
                     </p>
                   </div>
@@ -434,11 +434,11 @@ const CreateListing = () => {
                   {/* Pricing */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                      <label htmlFor="price" className="block text-sm font-medium text-peerly-700 mb-1">
+                      <label htmlFor="price" className="block text-sm font-medium text-snaplend-700 mb-1">
                         Rental price <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-peerly-400">₹</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-snaplend-400">₹</span>
                         <input
                           id="price"
                           type="number"
@@ -446,21 +446,21 @@ const CreateListing = () => {
                           onChange={(e) => setPrice(e.target.value)}
                           placeholder="0"
                           min="0"
-                          className="w-full pl-8 pr-4 py-3 border border-peerly-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                          className="w-full pl-8 pr-4 py-3 border border-snaplend-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                           required
                         />
                       </div>
                     </div>
                     
                     <div>
-                      <label htmlFor="pricingUnit" className="block text-sm font-medium text-peerly-700 mb-1">
+                      <label htmlFor="pricingUnit" className="block text-sm font-medium text-snaplend-700 mb-1">
                         Price per <span className="text-red-500">*</span>
                       </label>
                       <select
                         id="pricingUnit"
                         value={pricingUnit}
                         onChange={(e) => setPricingUnit(e.target.value)}
-                        className="w-full px-4 py-3 border border-peerly-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                        className="w-full px-4 py-3 border border-snaplend-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                         required
                       >
                         {pricingOptions.map((option) => (
@@ -475,18 +475,18 @@ const CreateListing = () => {
                   {/* Security deposit */}
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-1">
-                      <label htmlFor="deposit" className="block text-sm font-medium text-peerly-700">
+                      <label htmlFor="deposit" className="block text-sm font-medium text-snaplend-700">
                         Security deposit (optional)
                       </label>
                       <div className="relative group">
-                        <Info size={14} className="text-peerly-400 cursor-help" />
-                        <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-white rounded shadow-md text-xs text-peerly-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
+                        <Info size={14} className="text-snaplend-400 cursor-help" />
+                        <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-white rounded shadow-md text-xs text-snaplend-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity z-10">
                           A refundable amount collected to protect against damages.
                         </div>
                       </div>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-peerly-400">₹</span>
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-snaplend-400">₹</span>
                       <input
                         id="deposit"
                         type="number"
@@ -494,10 +494,10 @@ const CreateListing = () => {
                         onChange={(e) => setDeposit(e.target.value)}
                         placeholder="0"
                         min="0"
-                        className="w-full pl-8 pr-4 py-3 border border-peerly-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                        className="w-full pl-8 pr-4 py-3 border border-snaplend-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                       />
                     </div>
-                    <p className="mt-1 text-sm text-peerly-500">
+                    <p className="mt-1 text-sm text-snaplend-500">
                       This will be collected at the time of booking and refunded upon safe return.
                     </p>
                   </div>
@@ -508,11 +508,11 @@ const CreateListing = () => {
                       <input
                         id="terms"
                         type="checkbox"
-                        className="h-4 w-4 mt-1 text-primary border-peerly-300 rounded focus:ring-primary"
+                        className="h-4 w-4 mt-1 text-primary border-snaplend-300 rounded focus:ring-primary"
                         required
                       />
-                      <label htmlFor="terms" className="ml-2 block text-sm text-peerly-600">
-                        I confirm that I own this item or have permission to list it for rent. I agree to Peerly's{" "}
+                      <label htmlFor="terms" className="ml-2 block text-sm text-snaplend-600">
+                        I confirm that I own this item or have permission to list it for rent. I agree to SnapLend's{" "}
                         <Link to="/terms" className="text-primary hover:text-primary/80 transition-colors">
                           Terms of Service
                         </Link>.
@@ -559,9 +559,14 @@ const CreateListing = () => {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Publishing...
+                        Creating listing...
                       </div>
-                    ) : "Publish Listing"}
+                    ) : (
+                      <>
+                        Create Listing
+                        <ArrowRight size={16} className="ml-2" />
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
