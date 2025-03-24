@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
-import { confirmPayment } from "@/services/paymentService";
+import { confirmStripePayment } from "@/services/stripePaymentService";
 import { useToast } from "@/components/ui/use-toast";
 
 const PaymentSuccess = () => {
@@ -26,7 +26,7 @@ const PaymentSuccess = () => {
     const updatePaymentStatus = async () => {
       if (paymentIntentId) {
         try {
-          await confirmPayment(paymentIntentId, paymentStatus);
+          await confirmStripePayment(paymentIntentId, paymentStatus);
         } catch (error) {
           console.error("Error confirming payment:", error);
           toast({
