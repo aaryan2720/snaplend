@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Star, Heart, MapPin, Calendar, User, ExternalLink, Plus, ChevronRight } from "lucide-react";
@@ -28,13 +27,14 @@ export interface ListingProps {
   reviewCount: number;
   image: string;
   owner: Owner;
-  featured?: boolean; // Added featured property as optional
+  featured?: boolean;
+  category?: string;
 }
 
 interface ListingCardProps {
   listing: ListingProps;
-  className?: string; // Added className property to allow styling from parent
-  style?: React.CSSProperties; // Added style property for animation delays
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) => {
@@ -45,7 +45,6 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
     threshold: 0.1,
   });
   
-  // Unit display mapping
   const unitDisplay = {
     hour: "hr",
     day: "day",
@@ -53,15 +52,12 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
     month: "mo"
   };
   
-  // Calculate discount price for display purposes (just for UI demo)
   const originalPrice = Math.round(listing.price * 1.2);
   
-  // Function to handle adding to cart with animation
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // Add cart animation here if needed
     addToCart(listing);
   };
   
@@ -74,7 +70,6 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
       className={`group h-full flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white hover:shadow-lg transition-all duration-300 ${className || ""}`}
       style={style}
     >
-      {/* Image Container */}
       <Link to={`/item/${listing.id}`} className="relative pt-[75%] bg-gray-100 overflow-hidden">
         <motion.img
           src={listing.image}
@@ -84,7 +79,6 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
           transition={{ duration: 0.5 }}
         />
         
-        {/* Top badges */}
         <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
           <Badge className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-0 py-1 shadow-md">
             {listing.priceUnit === "day" ? "Daily Rental" : 
@@ -106,14 +100,12 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
           </motion.button>
         </div>
         
-        {/* Featured badge */}
         {listing.featured && (
           <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 px-3 py-1 rounded-full text-xs font-bold shadow-md">
             Featured
           </div>
         )}
         
-        {/* Owner badge */}
         <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm flex items-center">
           <Avatar className="h-6 w-6 border border-white mr-2">
             <img src={listing.owner.avatar} alt={listing.owner.name} />
@@ -122,9 +114,7 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
         </div>
       </Link>
       
-      {/* Content */}
       <div className="flex flex-1 flex-col p-4">
-        {/* Ratings and location */}
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center">
             <div className="bg-amber-50 px-2 py-1 rounded-full flex items-center">
@@ -139,21 +129,17 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
           </div>
         </div>
         
-        {/* Title */}
         <Link to={`/item/${listing.id}`} className="group-hover:text-indigo-600 transition-colors">
           <h3 className="font-semibold line-clamp-2 text-gray-800">{listing.title}</h3>
         </Link>
         
-        {/* Description */}
         <p className="mt-2 text-sm text-gray-500 line-clamp-2">{listing.description || "Experience the best rental in your area. Quality guaranteed with flexible timing options."}</p>
         
-        {/* Location */}
         <div className="mt-3 flex items-center text-xs text-gray-600">
           <MapPin size={14} className="mr-1 text-gray-400" />
           <span>{listing.location}</span>
         </div>
         
-        {/* Price section with animation */}
         <div className="mt-4 flex items-end justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -177,7 +163,6 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
           </motion.button>
         </div>
         
-        {/* Actions */}
         <div className="mt-4 pt-4 border-t border-gray-100">
           <Link to={`/item/${listing.id}`}>
             <Button 

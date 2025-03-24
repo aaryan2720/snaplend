@@ -30,6 +30,7 @@ const CategoryPage = () => {
     const fetchCategoryListings = async () => {
       try {
         const allListings = await fetchListings();
+        // Handle the case where category might be undefined
         const categoryListings = allListings.filter(
           (listing) => listing.category?.toLowerCase() === category?.toLowerCase()
         );
