@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Container } from "@/components/ui/container";
@@ -14,32 +15,23 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Slider } from "@/components/ui/slider"
-import { getAllListings } from "@/services/listingService";
-import ListingCard from "@/components/ListingCard";
-
-interface Listing {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  category: string;
-}
+import { fetchListings } from "@/services/listingService";
+import ListingCard, { ListingProps } from "@/components/ListingCard";
 
 const CategoryPage = () => {
   const { category } = useParams<{ category: string }>();
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [filteredListings, setFilteredListings] = useState<Listing[]>([]);
+  const [listings, setListings] = useState<ListingProps[]>([]);
+  const [filteredListings, setFilteredListings] = useState<ListingProps[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
   const [open, setOpen] = React.useState(false)
 
   useEffect(() => {
-    const fetchListings = async () => {
+    const fetchCategoryListings = async () => {
       try {
-        const allListings = await getAllListings();
+        const allListings = await fetchListings();
         const categoryListings = allListings.filter(
-          (listing) => listing.category.toLowerCase() === category?.toLowerCase()
+          (listing) => listing.category?.toLowerCase() === category?.toLowerCase()
         );
         setListings(categoryListings);
         setFilteredListings(categoryListings);
@@ -48,13 +40,13 @@ const CategoryPage = () => {
       }
     };
 
-    fetchListings();
+    fetchCategoryListings();
   }, [category]);
 
   useEffect(() => {
     // Apply search query filter
     let searchedListings = listings.filter((listing) =>
-      listing.name.toLowerCase().includes(searchQuery.toLowerCase())
+      listing.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     // Apply price range filter
