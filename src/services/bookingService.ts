@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface BookingPayload {
@@ -162,4 +161,29 @@ export const returnSecurityDeposit = async (bookingId: string): Promise<void> =>
     console.error(`Error returning deposit for booking ID ${bookingId}:`, error);
     throw error;
   }
+};
+
+// Add new function to fetch user bookings
+export const getUserBookings = async () => {
+  const { data: user } = await supabase.auth.getUser();
+  
+  if (!user || !user.user) {
+    throw new Error("User not authenticated");
+  }
+  
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(`
+      *,
+      listing:listings(*)
+    `)
+    .eq("renter_id", user.user.id)
+    .order("created_at", { ascending: false });
+    
+  if (error) {
+    console.error("Error fetching user bookings:", error);
+    throw error;
+  }
+  
+  return data;
 };

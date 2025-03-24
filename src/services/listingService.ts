@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
 
@@ -213,4 +212,46 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
     ...mapDbListingToFrontend(listing),
     featured: true
   }));
+};
+
+// Add function to get user's listings
+export const getUserListings = async (userId) => {
+  const { data, error } = await supabase
+    .from("listings")
+    .select("*")
+    .eq("owner_id", userId)
+    .order("created_at", { ascending: false });
+    
+  if (error) {
+    console.error("Error fetching user listings:", error);
+    throw error;
+  }
+  
+  return data;
+};
+
+// Add function to get user's favorite listings
+export const getFavorites = async () => {
+  const { data: userData } = await supabase.auth.getUser();
+  
+  if (!userData || !userData.user) {
+    throw new Error("User not authenticated");
+  }
+  
+  // This is a placeholder - in a real app, you would have a favorites table
+  // For demo purposes, we'll return an empty array
+  return [];
+};
+
+// Add function to toggle favorite status for a listing
+export const toggleFavorite = async (listingId) => {
+  const { data: userData } = await supabase.auth.getUser();
+  
+  if (!userData || !userData.user) {
+    throw new Error("User not authenticated");
+  }
+  
+  // This is a placeholder - in a real app, you would toggle the favorite status
+  // in a favorites table. For demo purposes, we just return true.
+  return true;
 };

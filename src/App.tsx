@@ -20,6 +20,12 @@ import AgreementPage from "./pages/AgreementPage";
 import Checkout from "./pages/Checkout";
 import CheckoutPayment from "./pages/CheckoutPayment";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import UserListings from "./pages/UserListings";
+import UserBookings from "./pages/UserBookings";
+import FavoritesPage from "./pages/FavoritesPage";
+import MessagesPage from "./pages/MessagesPage";
+import SettingsPage from "./pages/SettingsPage";
+import HowItWorks from "./pages/HowItWorks";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +38,7 @@ const AppRoutes = () => (
     <Route path="/explore" element={<Explore />} />
     <Route path="/browse/:category" element={<CategoryPage />} />
     <Route path="/checkout" element={<Checkout />} />
+    <Route path="/how-it-works" element={<HowItWorks />} />
     <Route path="/checkout/payment" element={
       <ProtectedRoute>
         <CheckoutPayment />
@@ -50,6 +57,31 @@ const AppRoutes = () => (
     <Route path="/agreement/:id" element={
       <ProtectedRoute>
         <AgreementPage />
+      </ProtectedRoute>
+    } />
+    <Route path="/listings" element={
+      <ProtectedRoute>
+        <UserListings />
+      </ProtectedRoute>
+    } />
+    <Route path="/bookings" element={
+      <ProtectedRoute>
+        <UserBookings />
+      </ProtectedRoute>
+    } />
+    <Route path="/favorites" element={
+      <ProtectedRoute>
+        <FavoritesPage />
+      </ProtectedRoute>
+    } />
+    <Route path="/messages" element={
+      <ProtectedRoute>
+        <MessagesPage />
+      </ProtectedRoute>
+    } />
+    <Route path="/settings" element={
+      <ProtectedRoute>
+        <SettingsPage />
       </ProtectedRoute>
     } />
     <Route 
