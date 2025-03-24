@@ -99,7 +99,9 @@ const CheckoutPayment = () => {
           navigate("/payment-success", { 
             state: { 
               bookingIds,
-              totalAmount
+              totalAmount,
+              paymentIntentId: paymentIntent.id,
+              paymentStatus: 'succeeded'
             }
           });
         }, 2000);

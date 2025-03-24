@@ -18,6 +18,8 @@ import CategoryPage from "./pages/CategoryPage";
 import UserProfile from "./pages/UserProfile";
 import AgreementPage from "./pages/AgreementPage";
 import Checkout from "./pages/Checkout";
+import CheckoutPayment from "./pages/CheckoutPayment";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,16 @@ const AppRoutes = () => (
     <Route path="/explore" element={<Explore />} />
     <Route path="/browse/:category" element={<CategoryPage />} />
     <Route path="/checkout" element={<Checkout />} />
+    <Route path="/checkout/payment" element={
+      <ProtectedRoute>
+        <CheckoutPayment />
+      </ProtectedRoute>
+    } />
+    <Route path="/payment-success" element={
+      <ProtectedRoute>
+        <PaymentSuccess />
+      </ProtectedRoute>
+    } />
     <Route path="/profile" element={
       <ProtectedRoute>
         <UserProfile />
