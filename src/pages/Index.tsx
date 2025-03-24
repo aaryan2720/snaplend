@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import CategoryList from "@/components/CategoryList";
+import { CategoryList } from "@/components/CategoryList";
 import FeaturedListings from "@/components/FeaturedListings";
 import RecommendedItems from "@/components/RecommendedItems";
 import FurnitureSection from "@/components/FurnitureSection";

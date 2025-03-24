@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -159,3 +160,6 @@ export function CategoryList() {
     </div>
   );
 }
+
+// Also add a default export for backward compatibility
+export default CategoryList;
