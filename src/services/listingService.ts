@@ -1,5 +1,4 @@
-
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
 
 // Type for creating a new listing
@@ -47,17 +46,30 @@ const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
     rating: 4.5 // Default rating for now, can be calculated from reviews later
   };
 
+  // Process image URLs - check if they're full URLs or storage paths
+  let imageUrl = "https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800";
+  
+  if (dbListing.image_urls && dbListing.image_urls.length > 0) {
+    const firstImage = dbListing.image_urls[0];
+    if (firstImage.startsWith('http')) {
+      imageUrl = firstImage;
+    } else {
+      // Assume it's a storage path
+      imageUrl = getStorageUrl('listings', firstImage);
+    }
+  }
+
   return {
     id: dbListing.id,
     title: dbListing.title,
     description: dbListing.description,
     price: dbListing.price,
-    priceUnit: "day", // Default value, should be stored in DB
+    priceUnit: "day" as "hour" | "day" | "week" | "month", // Ensure type is correct
     location: dbListing.location,
     distance: "Near you", // This would need to be calculated based on user's location
     rating: 4.5, // Default value, should be calculated from reviews
     reviewCount: 0, // Default value, should be counted from reviews
-    image: dbListing.image_urls?.[0] || "/placeholder.svg",
+    image: imageUrl,
     owner,
     featured: false // Default value, can be set based on some criteria later
   };
@@ -264,7 +276,11 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
 
     if (error) {
       console.error("Error fetching featured listings:", error);
-      return [];
+      return getDefaultListings();
+    }
+
+    if (!data || data.length === 0) {
+      return getDefaultListings();
     }
 
     return (data as DbListing[]).map(listing => ({
@@ -273,8 +289,86 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
     }));
   } catch (err) {
     console.error("Exception fetching featured listings:", err);
-    return [];
+    return getDefaultListings();
   }
+};
+
+// Provide default listings when needed
+export const getDefaultListings = (): ListingProps[] => {
+  return [
+    {
+      id: 'default-1',
+      title: 'Professional DSLR Camera Kit',
+      description: 'Canon EOS 5D Mark IV with lenses and accessories',
+      price: 1200,
+      priceUnit: "day",
+      location: 'Indiranagar, Bangalore',
+      distance: '2.5 km',
+      rating: 4.8,
+      reviewCount: 24,
+      image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000&h=800',
+      owner: {
+        name: 'Rahul M.',
+        avatar: 'https://i.pravatar.cc/150?img=68',
+        rating: 4.9
+      },
+      featured: true
+    },
+    {
+      id: 'default-2',
+      title: 'Mountain Bike - Trek X-Caliber 8',
+      description: 'Perfect for trails and off-road adventures',
+      price: 450,
+      priceUnit: "day",
+      location: 'Koramangala, Bangalore',
+      distance: '3.8 km',
+      rating: 4.6,
+      reviewCount: 18,
+      image: 'https://images.unsplash.com/photo-1545714968-62a0bf2c033d?auto=format&fit=crop&q=80&w=1000&h=800',
+      owner: {
+        name: 'Priya S.',
+        avatar: 'https://i.pravatar.cc/150?img=47',
+        rating: 4.7
+      },
+      featured: true
+    },
+    {
+      id: 'default-3',
+      title: 'Drone - DJI Mini 2',
+      description: 'Lightweight drone perfect for aerial photography',
+      price: 650,
+      priceUnit: "day",
+      location: 'HSR Layout, Bangalore',
+      distance: '5.2 km',
+      rating: 4.8,
+      reviewCount: 12,
+      image: 'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800',
+      owner: {
+        name: 'Vikram S.',
+        avatar: 'https://i.pravatar.cc/150?img=67',
+        rating: 4.9
+      },
+      featured: true
+    },
+    {
+      id: 'default-4',
+      title: 'Projector - Epson Home Cinema',
+      description: 'Full HD projector for home theater setup',
+      price: 500,
+      priceUnit: "day",
+      location: 'Whitefield, Bangalore',
+      distance: '7.5 km',
+      rating: 4.6,
+      reviewCount: 8,
+      image: 'https://images.unsplash.com/photo-1588416499018-d8c952dc4554?auto=format&fit=crop&q=80&w=1000&h=800',
+      owner: {
+        name: 'Arjun P.',
+        avatar: 'https://i.pravatar.cc/150?img=59',
+        rating: 4.7
+      },
+      featured: true
+    }
+  ];
 };
 
 // Get user's favorites

@@ -8,6 +8,7 @@ import { CheckCircle, Download, Printer, Share2 } from "lucide-react";
 import { confirmStripePayment } from "@/services/stripePaymentService";
 import { useToast } from "@/components/ui/use-toast";
 import confetti from "canvas-confetti";
+import { Progress } from "@/components/ui/progress";
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -15,6 +16,7 @@ const PaymentSuccess = () => {
   const { toast } = useToast();
   const [animationComplete, setAnimationComplete] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [progressValue, setProgressValue] = useState(0);
   
   const { bookingIds, totalAmount, paymentIntentId = null, paymentStatus = "succeeded" } = location.state || {};
   
@@ -25,8 +27,23 @@ const PaymentSuccess = () => {
       return;
     }
     
+    // Animate progress bar
+    const animateProgress = () => {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 4;
+        setProgressValue(progress);
+        
+        if (progress >= 100) {
+          clearInterval(interval);
+          setAnimationComplete(true);
+          runConfettiAnimation();
+        }
+      }, 50);
+    };
+    
     // Trigger success animation
-    const runAnimation = async () => {
+    const runConfettiAnimation = () => {
       // Launch confetti
       const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
@@ -44,8 +61,6 @@ const PaymentSuccess = () => {
         
         if (Date.now() < animationEnd) {
           requestAnimationFrame(confettiAnimation);
-        } else {
-          setAnimationComplete(true);
         }
       };
       
@@ -59,7 +74,8 @@ const PaymentSuccess = () => {
       });
     };
     
-    runAnimation();
+    // Start the progress animation
+    animateProgress();
     
     // Confirm payment in backend if paymentIntentId is provided
     const updatePaymentStatus = async () => {
@@ -99,23 +115,33 @@ const PaymentSuccess = () => {
       <div className="w-full max-w-lg">
         <div className="animate-fade-in">
           <Card className="border-green-200 shadow-md overflow-hidden">
-            <div className="bg-green-50 p-8 flex flex-col items-center text-center">
-              <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4 animate-[pulse_2s_ease-in-out_infinite]">
-                <CheckCircle className="h-12 w-12 text-green-600" strokeWidth={1.5} />
+            {!animationComplete && (
+              <div className="p-6 bg-green-50">
+                <h2 className="text-xl font-semibold mb-4 text-center text-green-800">Processing Your Payment</h2>
+                <Progress value={progressValue} className="h-2 mb-2" />
+                <p className="text-center text-green-700 text-sm">{progressValue}%</p>
               </div>
-              
-              <h1 className="text-2xl font-bold mb-2 text-green-800">Payment Successful!</h1>
-              
-              <p className="text-green-700 mb-2">
-                Thank you for your order. Your payment of ₹{totalAmount} has been processed successfully.
-              </p>
-              
-              <div className="text-sm text-green-600 py-2 px-3 bg-green-100 rounded-full inline-block">
-                Transaction ID: {paymentIntentId?.substring(0, 8) || "TXN12345678"}
-              </div>
-            </div>
+            )}
             
-            <CardContent className="p-6">
+            {animationComplete && (
+              <div className="bg-green-50 p-8 flex flex-col items-center text-center">
+                <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4 animate-[pulse_2s_ease-in-out_infinite]">
+                  <CheckCircle className="h-12 w-12 text-green-600" strokeWidth={1.5} />
+                </div>
+                
+                <h1 className="text-2xl font-bold mb-2 text-green-800">Payment Successful!</h1>
+                
+                <p className="text-green-700 mb-2">
+                  Thank you for your order. Your payment of ₹{totalAmount} has been processed successfully.
+                </p>
+                
+                <div className="text-sm text-green-600 py-2 px-3 bg-green-100 rounded-full inline-block">
+                  Transaction ID: {paymentIntentId?.substring(0, 8) || "TXN12345678"}
+                </div>
+              </div>
+            )}
+            
+            <CardContent className={`p-6 ${!animationComplete ? 'opacity-50' : ''}`}>
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                   <h3 className="font-medium mb-2 text-snaplend-800">Booking Details</h3>
@@ -141,7 +167,7 @@ const PaymentSuccess = () => {
                     onClick={handleDownloadAgreement} 
                     variant="outline"
                     className="w-full flex items-center justify-center bg-white hover:bg-blue-50"
-                    disabled={downloading}
+                    disabled={downloading || !animationComplete}
                   >
                     {downloading ? (
                       <>
@@ -162,6 +188,7 @@ const PaymentSuccess = () => {
                     variant="ghost" 
                     size="sm" 
                     className="text-gray-600"
+                    disabled={!animationComplete}
                     onClick={() => {
                       toast({
                         title: "Print requested",
@@ -177,6 +204,7 @@ const PaymentSuccess = () => {
                     variant="ghost" 
                     size="sm" 
                     className="text-gray-600"
+                    disabled={!animationComplete}
                     onClick={() => {
                       toast({
                         title: "Link copied",
@@ -194,12 +222,14 @@ const PaymentSuccess = () => {
                   <Button 
                     onClick={() => navigate("/bookings")}
                     variant="outline"
+                    disabled={!animationComplete}
                   >
                     View My Bookings
                   </Button>
                   
                   <Button 
                     asChild
+                    disabled={!animationComplete}
                   >
                     <Link to="/explore">
                       Continue Shopping

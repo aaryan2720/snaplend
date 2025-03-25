@@ -1,4 +1,5 @@
 
+// Mock service for stripe payments since we're not implementing real payments
 import { supabase } from "@/integrations/supabase/client";
 
 export interface PaymentIntent {
@@ -10,31 +11,30 @@ export interface PaymentIntent {
   client_secret: string;
 }
 
-// This function will call our Supabase Edge Function to create a Stripe payment intent
+// This function simulates creating a payment intent (without making real API calls)
 export const createStripePaymentIntent = async (bookingId: string, amount: number): Promise<PaymentIntent> => {
-  const { data, error } = await supabase.functions.invoke('create-stripe-payment', {
-    body: { bookingId, amount }
-  });
-
-  if (error) {
-    console.error("Error creating Stripe payment intent:", error);
-    throw error;
-  }
-
-  return data as PaymentIntent;
+  // Simulate a delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Mock payment intent
+  return {
+    id: 'pi_' + Math.random().toString(36).substring(2, 15),
+    booking_id: bookingId,
+    amount: amount,
+    currency: 'inr',
+    status: 'succeeded',
+    client_secret: 'mock_secret_' + Math.random().toString(36).substring(2, 15)
+  };
 };
 
-// Confirm the payment with Stripe
+// Confirm the payment (mock function)
 export const confirmStripePayment = async (
   paymentIntentId: string, 
   status: PaymentIntent['status']
 ): Promise<void> => {
-  const { error } = await supabase.functions.invoke('confirm-stripe-payment', {
-    body: { paymentIntentId, status }
-  });
-
-  if (error) {
-    console.error("Error confirming payment:", error);
-    throw error;
-  }
+  // Simulate a delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  console.log(`Payment ${paymentIntentId} confirmed with status: ${status}`);
+  return;
 };
