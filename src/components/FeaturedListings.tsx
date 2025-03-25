@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/container";
@@ -189,10 +190,10 @@ const FeaturedListings = () => {
       setLoading(true);
       try {
         const listings = await fetchFeaturedListings();
-        setFeaturedListings(listings.length > 0 ? listings : defaultFeaturedListings);
+        setFeaturedListings(listings.length > 0 ? listings : getDefaultFeaturedListings());
       } catch (error) {
         console.error("Error loading featured listings:", error);
-        setFeaturedListings(defaultFeaturedListings);
+        setFeaturedListings(getDefaultFeaturedListings());
       } finally {
         setLoading(false);
       }
@@ -202,80 +203,82 @@ const FeaturedListings = () => {
   }, []);
   
   // Sample featured listings data as fallback
-  const defaultFeaturedListings = [
-    {
-      id: "1",
-      title: "Professional DSLR Camera Kit",
-      description: "Canon EOS 5D Mark IV with multiple lenses, perfect for photography enthusiasts or events.",
-      price: 1200,
-      priceUnit: "day",
-      location: "Indiranagar, Bangalore",
-      distance: "2.5 km",
-      rating: 4.9,
-      reviewCount: 47,
-      image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=600&h=400",
-      owner: {
-        name: "Priya S.",
-        avatar: "https://i.pravatar.cc/150?img=32",
+  const getDefaultFeaturedListings = (): ListingProps[] => {
+    return [
+      {
+        id: "1",
+        title: "Professional DSLR Camera Kit",
+        description: "Canon EOS 5D Mark IV with multiple lenses, perfect for photography enthusiasts or events.",
+        price: 1200,
+        priceUnit: "day",
+        location: "Indiranagar, Bangalore",
+        distance: "2.5 km",
         rating: 4.9,
+        reviewCount: 47,
+        image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=600&h=400",
+        owner: {
+          name: "Priya S.",
+          avatar: "https://i.pravatar.cc/150?img=32",
+          rating: 4.9,
+        },
+        featured: true,
       },
-      featured: true,
-    },
-    {
-      id: "2",
-      title: "Minimalist Wooden Desk",
-      description: "Beautiful oak desk, perfect for a home office or study space.",
-      price: 500,
-      priceUnit: "week",
-      location: "Koramangala, Bangalore",
-      distance: "4 km",
-      rating: 4.7,
-      reviewCount: 23,
-      image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=600&h=400",
-      owner: {
-        name: "Rahul M.",
-        avatar: "https://i.pravatar.cc/150?img=12",
-        rating: 4.8,
-      },
-      featured: true,
-    },
-    {
-      id: "3",
-      title: "Electric Scooter",
-      description: "Eco-friendly urban mobility solution, perfect for commuting around the city.",
-      price: 300,
-      priceUnit: "day",
-      location: "HSR Layout, Bangalore",
-      distance: "5.2 km",
-      rating: 4.6,
-      reviewCount: 19,
-      image: "https://images.unsplash.com/photo-1558981852-426c6c22a060?auto=format&fit=crop&q=80&w=600&h=400",
-      owner: {
-        name: "Arjun K.",
-        avatar: "https://i.pravatar.cc/150?img=59",
+      {
+        id: "2",
+        title: "Minimalist Wooden Desk",
+        description: "Beautiful oak desk, perfect for a home office or study space.",
+        price: 500,
+        priceUnit: "week",
+        location: "Koramangala, Bangalore",
+        distance: "4 km",
         rating: 4.7,
+        reviewCount: 23,
+        image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=600&h=400",
+        owner: {
+          name: "Rahul M.",
+          avatar: "https://i.pravatar.cc/150?img=12",
+          rating: 4.8,
+        },
+        featured: true,
       },
-      featured: true,
-    },
-    {
-      id: "4",
-      title: "Party & Event Sound System",
-      description: "Professional sound system with speakers, mixer and microphones for events.",
-      price: 1500,
-      priceUnit: "day",
-      location: "Whitefield, Bangalore",
-      distance: "7.8 km",
-      rating: 4.8,
-      reviewCount: 34,
-      image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600&h=400",
-      owner: {
-        name: "Neha T.",
-        avatar: "https://i.pravatar.cc/150?img=47",
-        rating: 5.0,
+      {
+        id: "3",
+        title: "Electric Scooter",
+        description: "Eco-friendly urban mobility solution, perfect for commuting around the city.",
+        price: 300,
+        priceUnit: "day",
+        location: "HSR Layout, Bangalore",
+        distance: "5.2 km",
+        rating: 4.6,
+        reviewCount: 19,
+        image: "https://images.unsplash.com/photo-1558981852-426c6c22a060?auto=format&fit=crop&q=80&w=600&h=400",
+        owner: {
+          name: "Arjun K.",
+          avatar: "https://i.pravatar.cc/150?img=59",
+          rating: 4.7,
+        },
+        featured: true,
       },
-      featured: true,
-    },
-  ];
+      {
+        id: "4",
+        title: "Party & Event Sound System",
+        description: "Professional sound system with speakers, mixer and microphones for events.",
+        price: 1500,
+        priceUnit: "day",
+        location: "Whitefield, Bangalore",
+        distance: "7.8 km",
+        rating: 4.8,
+        reviewCount: 34,
+        image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600&h=400",
+        owner: {
+          name: "Neha T.",
+          avatar: "https://i.pravatar.cc/150?img=47",
+          rating: 5.0,
+        },
+        featured: true,
+      },
+    ];
+  };
   
   // Animation variants for section elements
   const sectionVariants = {
