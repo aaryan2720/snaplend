@@ -21,7 +21,7 @@ const mockConversations = [
       avatar: 'https://i.pravatar.cc/150?img=59'
     },
     lastMessage: {
-      text: 'I'll be available tomorrow for the pickup. Is 2 PM okay with you?',
+      text: "I'll be available tomorrow for the pickup. Is 2 PM okay with you?",
       timestamp: new Date(Date.now() - 3600000 * 2),
       unread: true
     },
@@ -71,13 +71,13 @@ const mockMessages = [
   {
     id: 'm1',
     senderId: 'user1',
-    text: 'Hi, I'm interested in renting your mountain bike. Is it still available for this weekend?',
+    text: "Hi, I'm interested in renting your mountain bike. Is it still available for this weekend?",
     timestamp: new Date(Date.now() - 3600000 * 5),
   },
   {
     id: 'm2',
     senderId: 'currentUser',
-    text: 'Yes, it's available! When would you like to pick it up?',
+    text: "Yes, it's available! When would you like to pick it up?",
     timestamp: new Date(Date.now() - 3600000 * 4),
   },
   {
@@ -95,7 +95,7 @@ const mockMessages = [
   {
     id: 'm5',
     senderId: 'user1',
-    text: 'I'll be available tomorrow for the pickup. Is 2 PM okay with you?',
+    text: "I'll be available tomorrow for the pickup. Is 2 PM okay with you?",
     timestamp: new Date(Date.now() - 3600000 * 2),
   }
 ];
