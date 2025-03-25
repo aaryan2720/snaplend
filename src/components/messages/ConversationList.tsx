@@ -2,18 +2,43 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface ConversationProps {
-  conversations: any[];
+// Define types
+export interface ConversationUser {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+export interface ConversationMessage {
+  text: string;
+  timestamp: Date;
+  unread: boolean;
+}
+
+export interface ConversationListing {
+  id: string;
+  title: string;
+}
+
+export interface Conversation {
+  id: string;
+  otherUser: ConversationUser;
+  lastMessage: ConversationMessage;
+  listing: ConversationListing;
+}
+
+interface ConversationListProps {
+  conversations: Conversation[];
   activeConversation: string | null;
-  setActiveConversation: (id: string) => void;
+  onSelectConversation: (id: string) => void;
   formatDate: (date: Date) => string;
 }
 
-const ConversationList: React.FC<ConversationProps> = ({ 
-  conversations, 
-  activeConversation, 
-  setActiveConversation,
-  formatDate 
+const ConversationList: React.FC<ConversationListProps> = ({ 
+  conversations,
+  activeConversation,
+  onSelectConversation,
+  formatDate
 }) => {
   return (
     <div className="border rounded-lg overflow-hidden">
@@ -27,7 +52,7 @@ const ConversationList: React.FC<ConversationProps> = ({
             className={`p-4 border-b hover:bg-gray-50 cursor-pointer ${
               activeConversation === convo.id ? 'bg-gray-100' : ''
             }`}
-            onClick={() => setActiveConversation(convo.id)}
+            onClick={() => onSelectConversation(convo.id)}
           >
             <div className="flex items-start space-x-3">
               <Avatar>

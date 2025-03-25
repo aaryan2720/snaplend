@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Container } from "@/components/ui/container";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,8 +7,8 @@ import { Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import ConversationList from "@/components/messages/ConversationList";
-import MessageItem from "@/components/messages/MessageItem";
+import ConversationList, { Conversation } from "@/components/messages/ConversationList";
+import MessageItem, { Message } from "@/components/messages/MessageItem";
 import ChatHeader from "@/components/messages/ChatHeader";
 import MessageInput from "@/components/messages/MessageInput";
 
@@ -129,8 +130,8 @@ const MessagesPage = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -164,7 +165,7 @@ const MessagesPage = () => {
     if (!newMessage.trim()) return;
     
     // Add the new message
-    const newMessageObj = {
+    const newMessageObj: Message = {
       id: `m${Date.now()}`,
       senderId: 'currentUser',
       text: newMessage,
@@ -193,8 +194,6 @@ const MessagesPage = () => {
     );
   }
 
-  const activeConversationData = conversations.find(c => c.id === activeConversation) || null;
-
   return (
     <Container className="py-12 min-h-screen">
       <div className="max-w-6xl mx-auto">
@@ -218,10 +217,10 @@ const MessagesPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
             {/* Conversations List */}
-            <ConversationList 
+            <ConversationList
               conversations={conversations}
               activeConversation={activeConversation}
-              setActiveConversation={(id) => setActiveConversation(id)}
+              onSelectConversation={setActiveConversation}
               formatDate={formatDate}
             />
 
@@ -229,20 +228,22 @@ const MessagesPage = () => {
             <div className="md:col-span-2 border rounded-lg flex flex-col">
               {activeConversation ? (
                 <>
-                  <ChatHeader conversation={activeConversationData} />
+                  <ChatHeader
+                    conversation={conversations.find(c => c.id === activeConversation) || null}
+                  />
                   
                   <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
                     {messages.map((message) => (
                       <MessageItem 
-                        key={message.id} 
-                        message={message} 
-                        formatTime={formatTime} 
+                        key={message.id}
+                        message={message}
+                        formatTime={formatTime}
                       />
                     ))}
                     <div ref={messagesEndRef} />
                   </div>
                   
-                  <MessageInput 
+                  <MessageInput
                     newMessage={newMessage}
                     setNewMessage={setNewMessage}
                     handleSendMessage={handleSendMessage}

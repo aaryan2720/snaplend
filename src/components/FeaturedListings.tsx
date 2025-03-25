@@ -11,8 +11,12 @@ import {
   Share2, 
   ChevronRight,
   Award,
-  Bookmark
+  Bookmark,
+  Loader2
 } from "lucide-react";
+import { fetchFeaturedListings } from "@/services/listingService";
+import { ListingProps } from "@/components/ListingCard";
+import { Link } from "react-router-dom";
 
 // Enhanced listing card component with animations and improved design
 const EnhancedListingCard = ({ listing, index }) => {
@@ -176,8 +180,29 @@ const EnhancedListingCard = ({ listing, index }) => {
 
 // Enhanced FeaturedListings component
 const FeaturedListings = () => {
-  // Sample featured listings data
-  const featuredListings = [
+  const [featuredListings, setFeaturedListings] = useState<ListingProps[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("All");
+  
+  useEffect(() => {
+    const loadFeaturedListings = async () => {
+      setLoading(true);
+      try {
+        const listings = await fetchFeaturedListings();
+        setFeaturedListings(listings.length > 0 ? listings : defaultFeaturedListings);
+      } catch (error) {
+        console.error("Error loading featured listings:", error);
+        setFeaturedListings(defaultFeaturedListings);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadFeaturedListings();
+  }, []);
+  
+  // Sample featured listings data as fallback
+  const defaultFeaturedListings = [
     {
       id: "1",
       title: "Professional DSLR Camera Kit",
@@ -251,8 +276,6 @@ const FeaturedListings = () => {
       featured: true,
     },
   ];
-
-  const [activeTab, setActiveTab] = useState("All");
   
   // Animation variants for section elements
   const sectionVariants = {
@@ -270,6 +293,19 @@ const FeaturedListings = () => {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0 }
   };
+
+  if (loading) {
+    return (
+      <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-peerly-50/90 to-white">
+        <Container>
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+            <p className="text-gray-600">Loading featured listings...</p>
+          </div>
+        </Container>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-peerly-50/90 to-white">
@@ -338,11 +374,12 @@ const FeaturedListings = () => {
         {/* Listings grid with responsive layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {featuredListings.map((listing, index) => (
-            <EnhancedListingCard 
-              key={listing.id} 
-              listing={listing}
-              index={index}
-            />
+            <Link key={listing.id} to={`/item/${listing.id}`}>
+              <EnhancedListingCard 
+                listing={listing}
+                index={index}
+              />
+            </Link>
           ))}
         </div>
         

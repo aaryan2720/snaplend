@@ -1,13 +1,15 @@
 
 import React from "react";
 
+export interface Message {
+  id: string;
+  senderId: string;
+  text: string;
+  timestamp: Date;
+}
+
 interface MessageItemProps {
-  message: {
-    id: string;
-    senderId: string;
-    text: string;
-    timestamp: Date;
-  };
+  message: Message;
   formatTime: (date: Date) => string;
 }
 

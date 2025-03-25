@@ -3,15 +3,24 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const initializeSupabase = async () => {
   try {
-    // Call the initialization function
-    const { data, error } = await supabase.functions.invoke('init');
+    // Create storage bucket if it doesn't exist
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const listingsBucketExists = buckets?.some(bucket => bucket.name === 'listings');
     
-    if (error) {
-      console.error('Error initializing Supabase:', error);
-      return false;
+    if (!listingsBucketExists) {
+      const { data, error } = await supabase.storage.createBucket('listings', {
+        public: true,
+        fileSizeLimit: 5 * 1024 * 1024 // 5MB
+      });
+      
+      if (error) {
+        console.error('Error creating listings bucket:', error);
+        return false;
+      }
+      
+      console.log('Created listings bucket:', data);
     }
     
-    console.log('Supabase initialization success:', data);
     return true;
   } catch (error) {
     console.error('Failed to initialize Supabase:', error);
