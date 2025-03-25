@@ -10,15 +10,13 @@ export const initializeSupabase = async () => {
       return false;
     }
     
-    // Attempting to list buckets may fail due to permissions, so we'll handle that gracefully
+    // Check if 'listings' bucket exists and create if needed
     try {
       const { data: buckets, error } = await supabase.storage.listBuckets();
       
       if (error) {
         console.log("Cannot list buckets, may need specific permissions:", error.message);
-        // Just continue, don't try to create bucket
       } else {
-        // Only try to create bucket if we can successfully list them
         const listingsBucketExists = buckets?.some(bucket => bucket.name === 'listings');
         
         if (!listingsBucketExists) {
@@ -26,13 +24,26 @@ export const initializeSupabase = async () => {
           try {
             const { data, error: createError } = await supabase.storage.createBucket('listings', {
               public: true,
-              fileSizeLimit: 5 * 1024 * 1024 // 5MB
+              fileSizeLimit: 10 * 1024 * 1024 // 10MB
             });
             
             if (createError) {
               console.log("Couldn't create listings bucket:", createError.message);
             } else {
-              console.log("Created listings bucket successfully:", data);
+              console.log("Created listings bucket successfully");
+              
+              // Set CORS policy for the bucket to allow public access
+              const { error: corsError } = await supabase.storage.from('listings').setCorsRules([
+                {
+                  allowedOrigins: ['*'],
+                  allowedMethods: ['GET'],
+                  maxAgeSeconds: 3600
+                }
+              ]);
+              
+              if (corsError) {
+                console.log("Error setting CORS rules:", corsError.message);
+              }
             }
           } catch (createBucketError) {
             console.log("Exception creating bucket:", createBucketError);

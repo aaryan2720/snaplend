@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ListingProps } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { getStorageUrl } from "@/integrations/supabase/client";
 
 interface ItemDetailContentProps {
   listing: ListingProps;
@@ -16,6 +17,11 @@ const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState(listing.image);
+  
+  // Extract additional images from the listing if available
+  const additionalImages = listing.additionalImages || [];
+  const allImages = [listing.image, ...additionalImages].filter(Boolean);
   
   const handleAddToCart = () => {
     addToCart(listing);
@@ -45,22 +51,38 @@ const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
       <div>
         <div className="rounded-2xl overflow-hidden bg-gray-100 mb-4 aspect-square">
           <img 
-            src={listing.image} 
+            src={selectedImage} 
             alt={listing.title} 
             className="w-full h-full object-cover"
           />
         </div>
         <div className="grid grid-cols-4 gap-4">
-          {/* Placeholder for additional images */}
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-lg overflow-hidden bg-gray-100 aspect-square">
-              <img 
-                src={listing.image} 
-                alt={`${listing.title} - view ${i+1}`} 
-                className="w-full h-full object-cover opacity-60 hover:opacity-100 transition"
-              />
-            </div>
-          ))}
+          {allImages.length > 0 ? (
+            allImages.slice(0, 4).map((img, i) => (
+              <div 
+                key={i} 
+                className="rounded-lg overflow-hidden bg-gray-100 aspect-square cursor-pointer"
+                onClick={() => setSelectedImage(img)}
+              >
+                <img 
+                  src={img} 
+                  alt={`${listing.title} - view ${i+1}`} 
+                  className={`w-full h-full object-cover transition ${selectedImage === img ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
+                />
+              </div>
+            ))
+          ) : (
+            // Fallback if no images
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="rounded-lg overflow-hidden bg-gray-100 aspect-square">
+                <img 
+                  src={listing.image} 
+                  alt={`${listing.title} - view ${i+1}`} 
+                  className="w-full h-full object-cover opacity-60 hover:opacity-100 transition"
+                />
+              </div>
+            ))
+          )}
         </div>
       </div>
       

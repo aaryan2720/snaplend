@@ -19,5 +19,16 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 
 // Helper function to get URLs for Supabase Storage
 export const getStorageUrl = (bucket: string, path: string): string => {
+  // Check if path is already a full URL
+  if (path && (path.startsWith('http://') || path.startsWith('https://'))) {
+    return path;
+  }
+  
+  // Handle empty paths
+  if (!path) {
+    return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/placeholder.jpg`;
+  }
+  
+  // Return the complete storage URL
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
 };

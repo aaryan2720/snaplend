@@ -1,3 +1,4 @@
+
 import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
 
@@ -54,7 +55,7 @@ const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
     if (firstImage.startsWith('http')) {
       imageUrl = firstImage;
     } else {
-      // Assume it's a storage path
+      // Use the storage URL helper function for non-absolute URLs
       imageUrl = getStorageUrl('listings', firstImage);
     }
   }
