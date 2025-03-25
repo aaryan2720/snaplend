@@ -1,28 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { 
-  Menu, 
-  X, 
-  Search, 
-  PlusCircle, 
-  Bell, 
-  Home, 
-  ShoppingBag,
-  Car, 
-  Sofa, 
-  Smartphone, 
-  Info, 
-  ChevronDown,
-  Mic,
-  MicOff
-} from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
-import UserMenu from "./UserMenu";
-import CartButton from "./CartButton";
-import { useAuth } from "@/contexts/AuthContext";
+import { Container } from "@/components/ui/container";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -32,9 +9,32 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { motion, AnimatePresence } from "framer-motion";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAuth } from "@/contexts/AuthContext";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Bell,
+  Car,
+  ChevronDown,
+  Home,
+  Info,
+  Menu,
+  Mic,
+  MicOff,
+  PlusCircle,
+  Search,
+  ShoppingBag,
+  Smartphone,
+  Sofa,
+  X
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import CartButton from "./CartButton";
+import UserMenu from "./UserMenu";
 
 const categories = [
   { 
@@ -347,7 +347,7 @@ const Navbar = () => {
             <form onSubmit={handleSearch} className="relative group">
               <Search className={cn(
                 "absolute left-3 top-1/2 transform -translate-y-1/2 transition-all duration-300",
-                isSearchFocused ? "text-primary" : "text-peerly-400"
+                isSearchFocused ? "text-primary" : "text-muted-foreground"
               )} size={18} />
               
               <motion.input
@@ -362,8 +362,8 @@ const Navbar = () => {
                   "pl-10 pr-12 py-2 w-56 lg:w-64 rounded-full border transition-all duration-300",
                   isSearchFocused 
                     ? "border-primary shadow-sm shadow-primary/20 bg-white" 
-                    : "border-peerly-200 bg-peerly-50/50",
-                  "placeholder-peerly-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                    : "border-border bg-muted/50",
+                  "placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                 )}
                 initial={{ width: "16rem" }}
                 animate={{ width: isSearchFocused ? "18rem" : "16rem" }}
@@ -458,7 +458,7 @@ const Navbar = () => {
             <form onSubmit={handleSearch} className="relative">
               <Search className={cn(
                 "absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300",
-                isSearchFocused ? "text-primary" : "text-peerly-400"
+                isSearchFocused ? "text-primary" : "text-muted-foreground"
               )} size={18} />
               
               <input
@@ -473,8 +473,8 @@ const Navbar = () => {
                   "pl-10 pr-12 py-2 w-36 rounded-full border transition-all duration-300",
                   isSearchFocused 
                     ? "border-primary shadow-sm shadow-primary/20" 
-                    : "border-peerly-200 bg-peerly-50/50",
-                  "placeholder-peerly-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                    : "border-border bg-muted/50",
+                  "placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
                 )}
               />
               
@@ -605,7 +605,7 @@ const Navbar = () => {
                   <Link
                     to="/explore"
                     className={cn(
-                      "flex items-center px-4 py-2 text-peerly-600 rounded-md hover:bg-primary/5 hover:text-primary font-medium transition-all duration-300",
+                      "flex items-center px-4 py-2 text-muted-foreground rounded-md hover:bg-primary/5 hover:text-primary font-medium transition-all duration-300",
                       isActive("/explore") && "bg-primary/10 text-primary"
                     )}
                     onClick={closeMobileMenu}
@@ -618,7 +618,7 @@ const Navbar = () => {
                   <Link
                     to="/how-it-works"
                     className={cn(
-                      "flex items-center px-4 py-2 text-peerly-600 rounded-md hover:bg-primary/5 hover:text-primary font-medium transition-all duration-300",
+                      "flex items-center px-4 py-2 text-muted-foreground rounded-md hover:bg-primary/5 hover:text-primary font-medium transition-all duration-300",
                       isActive("/how-it-works") && "bg-primary/10 text-primary"
                     )}
                     onClick={closeMobileMenu}

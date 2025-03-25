@@ -1,14 +1,14 @@
 
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Download, Printer, Share2 } from "lucide-react";
-import { confirmStripePayment } from "@/services/stripePaymentService";
-import { useToast } from "@/components/ui/use-toast";
-import confetti from "canvas-confetti";
+import { Container } from "@/components/ui/container";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/components/ui/use-toast";
+import { confirmStripePayment } from "@/services/stripePaymentService";
+import confetti from "canvas-confetti";
+import { CheckCircle, Download, Printer, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -183,34 +183,45 @@ const PaymentSuccess = () => {
                   </Button>
                 </div>
                 
-                <div className="flex items-center justify-center space-x-3 pt-2">
+                <div className="mt-6">
+                  <ReceiptTemplate
+                    bookingIds={bookingIds}
+                    totalAmount={totalAmount}
+                    paymentIntentId={paymentIntentId || "TXN12345678"}
+                    paymentDate={new Date()}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-center space-x-3 pt-6">
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     className="text-gray-600"
                     disabled={!animationComplete}
                     onClick={() => {
-                      toast({
-                        title: "Print requested",
-                        description: "Printing dialog should open now.",
-                      });
-                      // In a real app, this would trigger the print dialog
+                      const printWindow = window.open("", "_blank");
+                      if (printWindow) {
+                        printWindow.document.write(document.querySelector(".receipt-template")?.innerHTML || "");
+                        printWindow.document.close();
+                        printWindow.print();
+                      }
                     }}
                   >
                     <Printer className="mr-1 h-4 w-4" />
-                    Print
+                    Print Receipt
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="text-gray-600"
                     disabled={!animationComplete}
                     onClick={() => {
+                      // In a real app, this would open a share dialog
                       toast({
-                        title: "Link copied",
-                        description: "Booking confirmation link copied to clipboard.",
+                        title: "Share options",
+                        description: "Share dialog would open here.",
                       });
-                      // In a real app, this would copy a link to clipboard
                     }}
                   >
                     <Share2 className="mr-1 h-4 w-4" />

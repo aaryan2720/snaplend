@@ -50,7 +50,7 @@ const ListingCard = ({ listing }) => {
       <div className="p-4">
         {/* Title and rating */}
         <div className="flex justify-between items-start gap-2 mb-2">
-          <h3 className="font-semibold text-lg line-clamp-1 text-peerly-900 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-lg line-clamp-1 text-snaplend-900 group-hover:text-primary transition-colors">
             {listing.title}
           </h3>
           <div className="flex items-center gap-1 text-amber-500">
@@ -60,13 +60,13 @@ const ListingCard = ({ listing }) => {
         </div>
         
         {/* Location */}
-        <div className="flex items-center gap-1 text-sm text-peerly-500 mb-3">
+        <div className="flex items-center gap-1 text-sm text-snaplend-500 mb-3">
           <MapPin size={14} />
           <span className="line-clamp-1">{listing.location}</span>
         </div>
         
         {/* Description */}
-        <p className="text-sm text-peerly-600 line-clamp-2 mb-3 h-10">
+        <p className="text-sm text-snaplend-600 line-clamp-2 mb-3 h-10">
           {listing.description}
         </p>
         
@@ -92,14 +92,14 @@ const ListingCard = ({ listing }) => {
               className="w-8 h-8 rounded-full object-cover ring-2 ring-primary/20"
             />
             <div>
-              <p className="text-xs text-peerly-600">Owner</p>
+              <p className="text-xs text-snaplend-600">Owner</p>
               <p className="text-sm font-medium">{listing.owner.name}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-peerly-600">Price</p>
+            <p className="text-xs text-snaplend-600">Price</p>
             <p className="text-lg font-bold text-primary">
-              ₹{listing.price}<span className="text-xs text-peerly-500 font-normal">/{listing.priceUnit}</span>
+              ₹{listing.price}<span className="text-xs text-snaplend-500 font-normal">/{listing.priceUnit}</span>
             </p>
           </div>
         </div>
@@ -239,7 +239,7 @@ const VehiclesSection = () => {
               </h2>
             </motion.div>
             <motion.p 
-              className="text-lg text-peerly-600 max-w-2xl"
+              className="text-lg text-snaplend-600 max-w-2xl"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -308,7 +308,7 @@ const VehiclesSection = () => {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-1">Fully Insured</h3>
-              <p className="text-sm text-peerly-600">Every vehicle comes with comprehensive insurance coverage</p>
+              <p className="text-sm text-snaplend-600">Every vehicle comes with comprehensive insurance coverage</p>
             </div>
           </div>
           
@@ -318,7 +318,7 @@ const VehiclesSection = () => {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-1">Quick Booking</h3>
-              <p className="text-sm text-peerly-600">Reserve your vehicle in minutes with our seamless process</p>
+              <p className="text-sm text-snaplend-600">Reserve your vehicle in minutes with our seamless process</p>
             </div>
           </div>
           
@@ -328,7 +328,7 @@ const VehiclesSection = () => {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-1">24/7 Support</h3>
-              <p className="text-sm text-peerly-600">Our team is available around the clock for assistance</p>
+              <p className="text-sm text-snaplend-600">Our team is available around the clock for assistance</p>
             </div>
           </div>
         </motion.div>

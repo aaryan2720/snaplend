@@ -408,7 +408,7 @@ const Explore = () => {
             <Container>
               <div className="py-4 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <h3 className="font-medium text-peerly-900 mb-2 flex items-center">
+                  <h3 className="font-medium text-snaplend-900 mb-2 flex items-center">
                     <BadgeDollarSign size={16} className="mr-1 text-primary" />
                     Category
                   </h3>
@@ -425,7 +425,7 @@ const Explore = () => {
                         />
                         <label 
                           htmlFor={`category-${category.id}`}
-                          className="text-sm text-peerly-700 cursor-pointer"
+                          className="text-sm text-snaplend-700 cursor-pointer"
                         >
                           {category.name}
                         </label>
@@ -435,7 +435,7 @@ const Explore = () => {
                 </div>
                 
                 <div>
-                  <h3 className="font-medium text-peerly-900 mb-2 flex items-center">
+                  <h3 className="font-medium text-snaplend-900 mb-2 flex items-center">
                     <BadgeDollarSign size={16} className="mr-1 text-primary" />
                     Price Range
                   </h3>
@@ -452,7 +452,7 @@ const Explore = () => {
                         />
                         <label 
                           htmlFor={`price-${range.id}`}
-                          className="text-sm text-peerly-700 cursor-pointer"
+                          className="text-sm text-snaplend-700 cursor-pointer"
                         >
                           {range.name}
                         </label>
@@ -462,7 +462,7 @@ const Explore = () => {
                 </div>
                 
                 <div>
-                  <h3 className="font-medium text-peerly-900 mb-2 flex items-center">
+                  <h3 className="font-medium text-snaplend-900 mb-2 flex items-center">
                     <MapPin size={16} className="mr-1 text-primary" />
                     Location
                   </h3>
@@ -479,7 +479,7 @@ const Explore = () => {
                         />
                         <label 
                           htmlFor={`location-${loc.id}`}
-                          className="text-sm text-peerly-700 cursor-pointer"
+                          className="text-sm text-snaplend-700 cursor-pointer"
                         >
                           {loc.name}
                         </label>
@@ -512,12 +512,12 @@ const Explore = () => {
                       <div className="flex items-center space-x-2">
                         <input 
                           type="date" 
-                          className="px-2 py-1 border border-peerly-200 rounded text-sm flex-1"
+                          className="px-2 py-1 border border-snaplend-200 rounded text-sm flex-1"
                         />
                         <span className="text-peerly-500">-</span>
                         <input 
                           type="date" 
-                          className="px-2 py-1 border border-peerly-200 rounded text-sm flex-1"
+                          className="px-2 py-1 border border-snaplend-200 rounded text-sm flex-1"
                         />
                       </div>
                     </div>

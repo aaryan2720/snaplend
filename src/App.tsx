@@ -1,31 +1,32 @@
 
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+import AgreementPage from "./pages/AgreementPage";
+import CategoryPage from "./pages/CategoryPage";
+import Checkout from "./pages/Checkout";
+import CheckoutPayment from "./pages/CheckoutPayment";
+import CreateListing from "./pages/CreateListing";
+import Explore from "./pages/Explore";
+import FavoritesPage from "./pages/FavoritesPage";
+import HowItWorks from "./pages/HowItWorks";
 import Index from "./pages/Index";
 import ItemDetail from "./pages/ItemDetail";
 import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
-import CreateListing from "./pages/CreateListing";
-import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Explore from "./pages/Explore";
-import CategoryPage from "./pages/CategoryPage";
-import UserProfile from "./pages/UserProfile";
-import AgreementPage from "./pages/AgreementPage";
-import Checkout from "./pages/Checkout";
-import CheckoutPayment from "./pages/CheckoutPayment";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import UserListings from "./pages/UserListings";
-import UserBookings from "./pages/UserBookings";
-import FavoritesPage from "./pages/FavoritesPage";
 import MessagesPage from "./pages/MessagesPage";
+import NotFound from "./pages/NotFound";
+import PaymentPage from "./pages/PaymentPage";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import SettingsPage from "./pages/SettingsPage";
-import HowItWorks from "./pages/HowItWorks";
+import SignUp from "./pages/SignUp";
+import UserBookings from "./pages/UserBookings";
+import UserListings from "./pages/UserListings";
+import UserProfile from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,11 @@ const AppRoutes = () => (
     <Route path="/checkout/payment" element={
       <ProtectedRoute>
         <CheckoutPayment />
+      </ProtectedRoute>
+    } />
+    <Route path="/payment" element={
+      <ProtectedRoute>
+        <PaymentPage />
       </ProtectedRoute>
     } />
     <Route path="/payment-success" element={

@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
-import { Smartphone, ChevronRight, Star, Clock, Bookmark, TrendingUp } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+import { Bookmark, ChevronRight, Clock, Smartphone, Star, TrendingUp } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const gadgetCategories = [
   {
@@ -74,7 +74,7 @@ const GadgetsSection = () => {
   const otherGadgets = gadgetCategories.filter(gadget => !gadget.featured);
   
   return (
-    <section className="py-16 bg-gradient-to-b from-white to-peerly-50/50 relative overflow-hidden">
+    <section className="py-16 bg-gradient-to-b from-white to-snaplend-50/50 relative overflow-hidden">
       {/* Background pattern */}
       <div className="absolute -top-96 -left-96 w-192 h-192 bg-primary/5 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-64 -right-64 w-192 h-192 bg-violet-500/5 rounded-full blur-3xl"></div>
@@ -88,11 +88,11 @@ const GadgetsSection = () => {
             </Badge>
             <div className="flex items-center">
               <Smartphone className="mr-3 text-primary" size={32} />
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-peerly-900 tracking-tight">
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-snaplend-900 tracking-tight">
                 Electronics & Gadgets
               </h2>
             </div>
-            <p className="mt-3 text-peerly-600 text-lg leading-relaxed max-w-xl">
+            <p className="mt-3 text-snaplend-600 text-lg leading-relaxed max-w-xl">
               Rent the latest tech gadgets without the commitment of buying. Try before you invest!
             </p>
           </div>
@@ -180,7 +180,7 @@ const GadgetsSection = () => {
           {otherGadgets.map((gadget, index) => (
             <Card 
               key={gadget.id}
-              className="overflow-hidden rounded-xl border border-peerly-100 hover:border-primary/20 hover:shadow-md transition-all duration-300 cursor-pointer group"
+              className="overflow-hidden rounded-xl border border-snaplend-100 hover:border-primary/20 hover:shadow-md transition-all duration-300 cursor-pointer group"
               onClick={() => navigate(`/browse/electronics/${gadget.id}`)}
               style={{ 
                 animationDelay: `${index * 100}ms`,
@@ -198,7 +198,7 @@ const GadgetsSection = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute bottom-3 right-3">
-                    <Badge className="bg-white/90 text-peerly-900">
+                    <Badge className="bg-white/90 text-snaplend-900">
                       <Star size={12} className="mr-1 text-yellow-500" fill="currentColor" />
                       {gadget.avgRating}
                     </Badge>
@@ -214,11 +214,11 @@ const GadgetsSection = () => {
                 </Button>
               </div>
               <CardContent className="p-5">
-                <h3 className="font-bold text-peerly-900 text-lg group-hover:text-primary transition-colors">{gadget.name}</h3>
-                <p className="text-peerly-600 mt-2 leading-relaxed">{gadget.description}</p>
+                <h3 className="font-bold text-snaplend-900 text-lg group-hover:text-primary transition-colors">{gadget.name}</h3>
+                <p className="text-snaplend-600 mt-2 leading-relaxed">{gadget.description}</p>
               </CardContent>
               <CardFooter className="px-5 pb-5 pt-0 flex justify-between items-center">
-                <div className="flex items-center text-peerly-500 text-sm">
+                <div className="flex items-center text-snaplend-500 text-sm">
                   <Clock size={14} className="mr-1" />
                   <span>{gadget.rentalCount}+ rentals</span>
                 </div>

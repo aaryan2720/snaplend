@@ -67,7 +67,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				peerly: {
+				snaplend: {
 					50: '#f5f7fa',
 					100: '#e4e7eb',
 					200: '#cbd2d9',

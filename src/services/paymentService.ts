@@ -12,16 +12,49 @@ export interface PaymentIntent {
 
 // This function will call our Supabase Edge Function to create a payment intent
 export const createPaymentIntent = async (bookingId: string, amount: number): Promise<PaymentIntent> => {
-  const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-    body: { bookingId, amount }
-  });
+  try {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      console.error('Auth session details:', {
+        hasSession: !!session,
+        error: sessionError,
+        accessToken: session?.access_token
+      });
+      throw new Error('Authentication required');
+    }
+    
+    console.log('Attempting to create payment intent with:', {
+      bookingId,
+      amount,
+      accessToken: session.access_token.substring(0, 6) + '...'
+    });
+    
+    const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+      body: { bookingId, amount },
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    });
 
-  if (error) {
-    console.error("Error creating payment intent:", error);
+    if (error) {
+      console.error("Error creating payment intent:", {
+        message: error.message,
+        status: error.status,
+        stack: error.stack
+      });
+      throw new Error(error.message || 'Failed to create payment intent');
+    }
+
+    if (!data) {
+      throw new Error('No payment intent data received');
+    }
+
+    return data as PaymentIntent;
+  } catch (error) {
+    console.error("Error in createPaymentIntent:", error);
     throw error;
   }
-
-  return data as PaymentIntent;
 };
 
 // This function will store the payment result after successful processing

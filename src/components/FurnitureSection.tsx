@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Container } from "@/components/ui/container";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sofa, ChevronRight, Tag, Heart, TrendingUp, Layers, Clock, Users, ShieldCheck, StarIcon, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
+import { Container } from "@/components/ui/container";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronRight, Clock, Heart, Layers, ShieldCheck, Sofa, Sparkles, TrendingUp, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const furnitureCategories = [
   {
@@ -145,7 +145,7 @@ const CategoryCard = ({ category, isSaved, onSaveToggle, isHovered, onHover, onL
           
           {/* Bottom controls */}
           <div className="absolute inset-x-0 bottom-0 p-3 flex justify-between items-center">
-            <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-peerly-800">
+            <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-snaplend-800">
               {category.count} available
             </div>
             <motion.button 
@@ -158,7 +158,7 @@ const CategoryCard = ({ category, isSaved, onSaveToggle, isHovered, onHover, onL
               className={`p-2 rounded-full ${
                 isSaved
                   ? "bg-primary shadow-lg shadow-primary/20" 
-                  : "bg-white/90 text-peerly-700 hover:bg-white"
+                  : "bg-white/90 text-snaplend-700 hover:bg-white"
               } backdrop-blur-sm transition-all duration-300`}
             >
               <Heart size={16} className={isSaved ? "fill-white text-white" : ""} />
@@ -190,20 +190,20 @@ const CategoryCard = ({ category, isSaved, onSaveToggle, isHovered, onHover, onL
               <div className="p-1.5 bg-primary/10 rounded-md">
                 <Layers className="text-primary" size={14} />
               </div>
-              <h3 className="font-bold text-peerly-900 text-lg truncate">{category.name}</h3>
+              <h3 className="font-bold text-snaplend-900 text-lg truncate">{category.name}</h3>
             </div>
-            <p className="text-sm text-peerly-600 line-clamp-2 min-h-[40px]">{category.description}</p>
+            <p className="text-sm text-snaplend-600 line-clamp-2 min-h-[40px]">{category.description}</p>
           </div>
           
           {/* Statistics */}
           <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-lg mb-3">
             <div className="flex flex-col">
-              <span className="text-xs text-peerly-500 mb-1">Average Price</span>
+              <span className="text-xs text-snaplend-500 mb-1">Average Price</span>
               <span className="text-lg font-bold text-primary">{category.avgPrice}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-peerly-500 mb-1">Lenders</span>
-              <span className="text-lg font-bold text-peerly-900">{category.lenders}</span>
+              <span className="text-xs text-snaplend-500 mb-1">Lenders</span>
+              <span className="text-lg font-bold text-snaplend-900">{category.lenders}</span>
             </div>
           </div>
           
@@ -306,7 +306,7 @@ const FurnitureSection = () => {
               </motion.div>
               
               <motion.p 
-                className="text-lg text-peerly-600 max-w-2xl leading-relaxed"
+                className="text-lg text-snaplend-600 max-w-2xl leading-relaxed"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
@@ -350,7 +350,7 @@ const FurnitureSection = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-1">300+ Lenders</h3>
-                <p className="text-sm text-peerly-600">Verified and trusted local furniture providers</p>
+                <p className="text-sm text-snaplend-600">Verified and trusted local furniture providers</p>
               </div>
             </div>
             
@@ -360,7 +360,7 @@ const FurnitureSection = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-1">Quality Guaranteed</h3>
-                <p className="text-sm text-peerly-600">All items inspected and maintained to high standards</p>
+                <p className="text-sm text-snaplend-600">All items inspected and maintained to high standards</p>
               </div>
             </div>
             
@@ -370,7 +370,7 @@ const FurnitureSection = () => {
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-1">Flexible Rental Terms</h3>
-                <p className="text-sm text-peerly-600">Daily, weekly, or monthly options available</p>
+                <p className="text-sm text-snaplend-600">Daily, weekly, or monthly options available</p>
               </div>
             </div>
           </motion.div>

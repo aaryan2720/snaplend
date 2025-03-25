@@ -1,17 +1,15 @@
 
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useCart } from "@/contexts/CartContext";
-import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, CheckCircle, XCircle, AlertCircle, CreditCard, Calendar, ShieldCheck } from "lucide-react";
-import { createPaymentIntent } from "@/services/paymentService";
-import { createBooking } from "@/services/bookingService";
 import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/contexts/CartContext";
+import { AlertCircle, Calendar, CheckCircle, CreditCard, Loader2, ShieldCheck, XCircle } from "lucide-react";
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CheckoutPayment = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
@@ -58,61 +56,24 @@ const CheckoutPayment = () => {
     setPaymentStatus("processing");
     
     try {
-      // Step 1: Create a booking for each cart item
-      const newBookingIds: string[] = [];
+      // Calculate total amount including shipping and tax
+      const totalAmount = getCartTotal() + 49 + Math.round(getCartTotal() * 0.18);
       
-      for (const cartItem of cartItems) {
-        const booking = {
-          listing_id: cartItem.item.id,
-          start_date: new Date().toISOString(),
-          end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-          total_price: cartItem.item.price * cartItem.quantity,
-          deposit_paid: cartItem.item.price * 0.2 // 20% deposit
-        };
-        
-        const bookingId = await createBooking(booking);
-        newBookingIds.push(bookingId);
-      }
-      
-      // Step 2: Create payment intent (mock for MVP)
-      const totalAmount = getCartTotal();
-      const paymentIntent = await createPaymentIntent(newBookingIds[0], totalAmount);
-      
-      // Step 3: Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // 90% success rate for demo
-      const paymentSuccessful = Math.random() > 0.1;
-      
-      if (!paymentSuccessful) {
-        throw new Error("Payment simulation failed");
-      }
-      
-      // Success!
-      setPaymentStatus("success");
-      
-      // Clear cart after successful payment
-      clearCart();
-      
-      toast({
-        title: "Payment successful!",
-        description: "Your order has been placed successfully.",
-        variant: "default"
+      // Generate a mock client secret (in production this would come from your backend)
+      const mockClientSecret = 'mock_' + Math.random().toString(36).substr(2, 9);
+
+      // Navigate to payment page with necessary details
+      navigate("/payment", {
+        state: {
+          amount: totalAmount,
+          clientSecret: mockClientSecret
+        }
       });
       
-      // Redirect to success page after a delay
-      setTimeout(() => {
-        navigate("/payment-success", { 
-          state: { 
-            bookingIds: newBookingIds,
-            totalAmount,
-            paymentIntentId: paymentIntent.id,
-            paymentStatus: 'succeeded'
-          }
-        });
-      }, 1500);
+      setPaymentStatus("success");
+      clearCart(); // Clear the cart after successful navigation
     } catch (error) {
-      console.error("Payment processing error:", error);
+      console.error("Booking creation error:", error);
       setPaymentStatus("error");
       setErrorMessage(typeof error === 'object' && error !== null && 'message' in error 
         ? error.message 

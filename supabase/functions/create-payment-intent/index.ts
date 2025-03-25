@@ -41,8 +41,8 @@ serve(async (req) => {
   try {
     // Create Supabase client
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      'https://aklactzqyglyzkvwugjm.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrbGFjdHpxeWdseXprdnd1Z2ptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI3MDE0NjIsImV4cCI6MjA1ODI3NzQ2Mn0.afOHXyKjdpGvI2MzHMr6hcwalGGukwSXG96WDprjbjY',
       { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     );
     

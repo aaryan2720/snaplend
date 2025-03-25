@@ -1,11 +1,10 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
-import { Trash2, Plus, Minus } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/contexts/CartContext";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CartItems = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
@@ -13,11 +12,11 @@ const CartItems = () => {
   if (cartItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
-        <div className="w-16 h-16 mb-4 rounded-full bg-peerly-100 flex items-center justify-center">
-          <ShoppingCart size={24} className="text-peerly-400" />
+        <div className="w-16 h-16 mb-4 rounded-full bg-snaplend-100 flex items-center justify-center">
+          <ShoppingCart size={24} className="text-snaplend-400" />
         </div>
         <h3 className="text-lg font-medium mb-2">Your cart is empty</h3>
-        <p className="text-peerly-500 mb-6 max-w-xs">
+        <p className="text-snaplend-500 mb-6 max-w-xs">
           Looks like you haven't added any items to your cart yet.
         </p>
         <Link to="/explore">
@@ -75,7 +74,7 @@ const CartItems = () => {
                   <Button 
                     variant="ghost" 
                     size="icon"
-                    className="text-peerly-500 hover:text-red-500"
+                    className="text-snaplend-500 hover:text-red-500"
                     onClick={() => removeFromCart(cartItem.item.id)}
                   >
                     <Trash2 size={16} />
@@ -91,7 +90,7 @@ const CartItems = () => {
         <Separator className="mb-4" />
         
         <div className="flex justify-between mb-2">
-          <span className="text-peerly-600">Subtotal</span>
+          <span className="text-snaplend-600">Subtotal</span>
           <span className="font-medium">₹{getCartTotal()}</span>
         </div>
         

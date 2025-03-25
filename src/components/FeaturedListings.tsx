@@ -1,22 +1,20 @@
 
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Star, 
-  MapPin, 
-  Clock, 
-  TrendingUp, 
-  Heart, 
-  Share2, 
-  ChevronRight,
-  Award,
-  Bookmark,
-  Loader2
-} from "lucide-react";
-import { fetchFeaturedListings } from "@/services/listingService";
 import { ListingProps } from "@/components/ListingCard";
+import { Badge } from "@/components/ui/badge";
+import { Container } from "@/components/ui/container";
+import { fetchFeaturedListings } from "@/services/listingService";
+import { motion } from "framer-motion";
+import {
+  Award,
+  ChevronRight,
+  Heart,
+  Loader2,
+  MapPin,
+  Share2,
+  Star,
+  TrendingUp
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 // Enhanced listing card component with animations and improved design
@@ -299,7 +297,7 @@ const FeaturedListings = () => {
 
   if (loading) {
     return (
-      <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-peerly-50/90 to-white">
+      <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-snaplend-50/90 to-white">
         <Container>
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
@@ -311,7 +309,7 @@ const FeaturedListings = () => {
   }
 
   return (
-    <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-peerly-50/90 to-white">
+    <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-snaplend-50/90 to-white">
       {/* Background decorative elements */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/80 via-purple-500/80 to-pink-500/80" />
       

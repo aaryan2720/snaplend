@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/container";
-import { Search, ArrowRight, TrendingUp, Shield, Clock, MapPin, Mic, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useRef } from "react";
+import { ArrowRight, Mic, PlusCircle, Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 // Expanded categories with enhanced styling
 const categories = [
@@ -302,7 +302,7 @@ const Hero = () => {
             "transition-all duration-700 transform",
             isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           )}>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-peerly-900 leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-snaplend-900 leading-tight">
               <span className="relative inline-block">
                 Rent
                 <span className="absolute -bottom-1 left-0 w-full h-2 bg-primary/20 rounded-full"></span>
@@ -314,7 +314,7 @@ const Hero = () => {
               </span>
             </h1>
             
-            <p className="mt-6 text-xl text-peerly-600">
+            <p className="mt-6 text-xl text-snaplend-600">
               The smarter way to access what you need—without the commitment of ownership. 
               Connect with trusted local owners and <span className="text-primary font-semibold">save up to 70%</span> compared to buying new.
             </p>
@@ -335,14 +335,14 @@ const Hero = () => {
                   placeholder={searchExamples[currentPlaceholderIndex]}
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
-                  className="w-full py-4 pl-5 pr-24 text-lg rounded-xl border border-peerly-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-lg backdrop-blur-sm bg-white/90"
+                  className="w-full py-4 pl-5 pr-24 text-lg rounded-xl border border-snaplend-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-lg backdrop-blur-sm bg-white/90"
                 />
                 
                 {/* Voice search button */}
                 <button 
                   className={cn(
                     "absolute right-14 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors shadow-md",
-                    isListening ? "animate-pulse bg-red-500 text-white" : "bg-gray-100 text-peerly-600 hover:bg-gray-200"
+                    isListening ? "animate-pulse bg-red-500 text-white" : "bg-gray-100 text-snaplend-600 hover:bg-gray-200"
                   )}
                   aria-label="Voice Search"
                   onClick={handleVoiceSearch}
@@ -362,11 +362,11 @@ const Hero = () => {
             
             {/* Popular search tags */}
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <span className="text-xs text-peerly-500 mr-1">Popular:</span>
+              <span className="text-xs text-snaplend-500 mr-1">Popular:</span>
               {["Projector for wedding", "DJ setup", "Moving truck", "AC for summer", "Wedding decor"].map((tag) => (
                 <button 
                   key={tag}
-                  className="text-xs text-peerly-600 hover:text-primary transition-colors"
+                  className="text-xs text-snaplend-600 hover:text-primary transition-colors"
                   onClick={() => setSearchValue(tag)}
                 >
                   {tag}
@@ -377,7 +377,7 @@ const Hero = () => {
           
           {/* Enhanced Category Grid with Improved Styling and Animations */}
           <div className="mt-14 max-w-4xl mx-auto">
-            <h3 className="text-xl font-semibold text-peerly-800 mb-5 relative inline-block">
+            <h3 className="text-xl font-semibold text-snaplend-800 mb-5 relative inline-block">
               Browse Popular Categories
               <span className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-primary/10 via-primary/50 to-primary/10 rounded-full transform -translate-y-1"></span>
             </h3>
@@ -420,7 +420,7 @@ const Hero = () => {
                   <span 
                     className={cn(
                       "font-medium text-sm transition-all duration-300",
-                      hoveredCategory === index ? "text-primary font-semibold" : "text-peerly-800"
+                      hoveredCategory === index ? "text-primary font-semibold" : "text-snaplend-800"
                     )}
                   >
                     {category.name}
@@ -433,7 +433,7 @@ const Hero = () => {
           {/* Testimonial scrolling carousel with Indian context */}
           <div className="mt-16">
             <div className="mb-5">
-              <p className="text-sm uppercase tracking-wider text-peerly-500 font-medium">Trusted by 10,000+ renters across 50+ cities in India</p>
+              <p className="text-sm uppercase tracking-wider text-snaplend-500 font-medium">Trusted by 10,000+ renters across 50+ cities in India</p>
             </div>
             
             <div className="relative">
@@ -451,7 +451,7 @@ const Hero = () => {
                 {[...testimonials, ...testimonials].map((testimonial, index) => (
                   <div 
                     key={index}
-                    className="flex-shrink-0 w-64 bg-white rounded-lg p-4 shadow-md border border-peerly-100"
+                    className="flex-shrink-0 w-64 bg-white rounded-lg p-4 shadow-md border border-snaplend-100"
                   >
                     <div className="flex items-center gap-3 mb-3">
                       <img 
@@ -460,8 +460,8 @@ const Hero = () => {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <div>
-                        <p className="font-medium text-peerly-800">{testimonial.name}</p>
-                        <p className="text-xs text-peerly-500">{testimonial.location}</p>
+                        <p className="font-medium text-snaplend-800">{testimonial.name}</p>
+                        <p className="text-xs text-snaplend-500">{testimonial.location}</p>
                       </div>
                     </div>
                     
@@ -474,7 +474,7 @@ const Hero = () => {
                     </div>
                     
                     <p className="text-sm font-medium text-primary mb-1">Rented: {testimonial.item}</p>
-                    <p className="text-sm text-peerly-600">{testimonial.review}</p>
+                    <p className="text-sm text-snaplend-600">{testimonial.review}</p>
                   </div>
                 ))}
               </div>

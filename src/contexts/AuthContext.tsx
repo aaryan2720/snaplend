@@ -1,9 +1,9 @@
 
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Session, User } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
 
 interface AuthContextType {
   session: Session | null;
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       toast({
         title: "Sign in successful",
-        description: "Welcome back to Peerly!",
+        description: "Welcome back to SnapLend!",
       });
       
       navigate("/");
@@ -121,7 +121,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       toast({
         title: "Sign up successful",
-        description: "Welcome to Peerly! Your account has been created.",
+        description: "Welcome to SnapLend! Your account has been created.",
       });
       
       navigate("/");

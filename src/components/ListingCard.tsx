@@ -26,6 +26,8 @@ export interface ListingProps {
   rating: number;
   reviewCount: number;
   image: string;
+  image_urls?: string[];
+  additionalImages?: string[];
   owner: Owner;
   featured?: boolean;
   category?: string;

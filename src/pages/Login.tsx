@@ -154,7 +154,7 @@ const Login = () => {
                 <div className="mt-6 grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center py-3 px-4 border border-peerly-200 rounded-lg bg-white text-sm font-medium text-peerly-700 hover:bg-peerly-50 transition-colors"
+                    className="w-full inline-flex justify-center py-3 px-4 border border-snaplend-200 rounded-lg bg-white text-sm font-medium text-snaplend-700 hover:bg-snaplend-50 transition-colors"
                     onClick={() => alert("Google Sign-in will be implemented in future updates")}
                   >
                     <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -168,7 +168,7 @@ const Login = () => {
                   
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center py-3 px-4 border border-peerly-200 rounded-lg bg-white text-sm font-medium text-peerly-700 hover:bg-peerly-50 transition-colors"
+                    className="w-full inline-flex justify-center py-3 px-4 border border-snaplend-200 rounded-lg bg-white text-sm font-medium text-snaplend-700 hover:bg-snaplend-50 transition-colors"
                     onClick={() => alert("GitHub Sign-in will be implemented in future updates")}
                   >
                     <svg className="h-5 w-5 mr-2 text-[#24292F]" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

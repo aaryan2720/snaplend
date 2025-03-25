@@ -1,8 +1,4 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
-import { ShoppingCart } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +8,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useCart } from "@/contexts/CartContext";
+import { ShoppingCart } from "lucide-react";
 import CartItems from "./CartItems";
 
 const CartButton = () => {
@@ -22,7 +20,7 @@ const CartButton = () => {
     <Sheet>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <ShoppingCart size={20} className="text-peerly-600" />
+          <ShoppingCart size={20} className="text-snaplend-600" />
           {itemCount > 0 && (
             <Badge className="absolute -top-1 -right-1 px-1.5 min-w-[18px] h-[18px] text-xs flex items-center justify-center">
               {itemCount}
