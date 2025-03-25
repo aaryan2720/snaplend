@@ -1,184 +1,161 @@
 
 import React from "react";
 import { Container } from "@/components/ui/container";
+import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle, Clipboard, ArrowDown, MapPin, Calendar, CreditCard, ShieldCheck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Package, Truck, CreditCard, UserCheck, Search, HeartHandshake, Shield, MessageSquare } from "lucide-react";
+
+const StepCard = ({ number, title, description, icon }) => (
+  <Card className="relative">
+    <div className="absolute -top-5 left-6 w-10 h-10 rounded-full bg-snaplend-600 text-white flex items-center justify-center font-semibold">
+      {number}
+    </div>
+    <CardContent className="pt-8 pb-6 px-6">
+      <div className="flex items-start">
+        <div className="mr-4 mt-1 bg-primary/10 p-2 rounded-full">
+          {icon}
+        </div>
+        <div>
+          <h3 className="font-semibold text-lg mb-2">{title}</h3>
+          <p className="text-snaplend-600">{description}</p>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const FeatureItem = ({ icon, title, description }) => (
+  <div className="flex">
+    <div className="mr-4 mt-1 bg-primary/10 p-2 rounded-full">
+      {icon}
+    </div>
+    <div>
+      <h3 className="font-semibold text-lg mb-2">{title}</h3>
+      <p className="text-snaplend-600">{description}</p>
+    </div>
+  </div>
+);
 
 const HowItWorks = () => {
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5 }
-    }
-  };
-
-  const steps = [
-    {
-      icon: Search,
-      title: "Find What You Need",
-      description: "Browse thousands of items available for rent near you. Filter by category, price, and location."
-    },
-    {
-      icon: HeartHandshake,
-      title: "Reserve & Connect",
-      description: "Book your desired item for your specified dates and connect with the owner to arrange details."
-    },
-    {
-      icon: CreditCard,
-      title: "Secure Payment",
-      description: "Make a secure payment through our platform. We hold the payment until you confirm everything is good."
-    },
-    {
-      icon: Package,
-      title: "Pick Up or Delivery",
-      description: "Get your rented item through pickup or delivery based on what you've arranged with the owner."
-    },
-    {
-      icon: Truck,
-      title: "Enjoy & Return",
-      description: "Use the item during your rental period and return it in the same condition when you're done."
-    },
-    {
-      icon: UserCheck,
-      title: "Share Your Experience",
-      description: "Rate your experience and leave feedback for the owner to help build our community."
-    }
-  ];
-
-  const benefits = [
-    {
-      icon: Shield,
-      title: "Secure Transactions",
-      description: "Our platform ensures all payments and rentals are protected and secure."
-    },
-    {
-      icon: MessageSquare,
-      title: "Direct Communication",
-      description: "Chat directly with item owners to clarify any questions before booking."
-    },
-    {
-      icon: CreditCard,
-      title: "Flexible Payment Options",
-      description: "Pay securely using multiple payment methods that work for you."
-    }
-  ];
-
   return (
-    <Container className="py-16 min-h-screen">
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center max-w-3xl mx-auto mb-16"
-      >
-        <h1 className="text-4xl font-bold text-snaplend-900 mb-4">How SnapLend Works</h1>
-        <p className="text-lg text-snaplend-600 mb-8">
-          SnapLend makes it easy to rent items you need without the commitment of buying, 
-          and helps you earn money from things you own but don't use every day.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Button asChild size="lg">
-            <Link to="/explore">Start Browsing</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg">
-            <Link to="/create-listing">List Your Items</Link>
-          </Button>
-        </div>
-      </motion.div>
-
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-      >
-        {steps.map((step, index) => (
-          <motion.div key={index} variants={itemVariants}>
-            <Card className="h-full hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <step.icon className="text-primary h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                <p className="text-snaplend-600">{step.description}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7 }}
-        className="bg-snaplend-50 rounded-xl p-8 mb-16"
-      >
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-snaplend-900 mb-4">Why Choose SnapLend?</h2>
-          <p className="text-snaplend-600 max-w-2xl mx-auto">
-            Our platform is designed to make renting and lending safe, simple, and beneficial for everyone involved.
+    <Container className="py-16">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">How SnapLend Works</h1>
+          <p className="text-xl text-snaplend-600 max-w-2xl mx-auto">
+            SnapLend makes it easy to rent items from people in your community.
+            Here's how it works:
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {benefits.map((benefit, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2, duration: 0.5 }}
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4">
-                  <benefit.icon className="text-primary h-8 w-8" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
-                <p className="text-snaplend-600">{benefit.description}</p>
-              </div>
-            </motion.div>
-          ))}
+        <div className="space-y-12 mb-16">
+          <div className="relative space-y-8">
+            <StepCard
+              number={1}
+              title="Find the perfect item"
+              description="Browse thousands of items available for rent in your area. Filter by category, price, and location to find exactly what you need."
+              icon={<MapPin className="h-6 w-6 text-primary" />}
+            />
+            
+            <div className="flex justify-center">
+              <ArrowDown className="h-8 w-8 text-snaplend-300" />
+            </div>
+            
+            <StepCard
+              number={2}
+              title="Book your rental dates"
+              description="Select the dates you need the item for. You can see availability in real-time and request to book directly through the platform."
+              icon={<Calendar className="h-6 w-6 text-primary" />}
+            />
+            
+            <div className="flex justify-center">
+              <ArrowDown className="h-8 w-8 text-snaplend-300" />
+            </div>
+            
+            <StepCard
+              number={3}
+              title="Pay securely"
+              description="Make a secure payment through our platform. Your payment is held safely until you confirm that you've received the item."
+              icon={<CreditCard className="h-6 w-6 text-primary" />}
+            />
+            
+            <div className="flex justify-center">
+              <ArrowDown className="h-8 w-8 text-snaplend-300" />
+            </div>
+            
+            <StepCard
+              number={4}
+              title="Pick up & enjoy"
+              description="Meet the owner to pick up the item or arrange for delivery. Now you can enjoy using it for your rental period!"
+              icon={<CheckCircle className="h-6 w-6 text-primary" />}
+            />
+            
+            <div className="flex justify-center">
+              <ArrowDown className="h-8 w-8 text-snaplend-300" />
+            </div>
+            
+            <StepCard
+              number={5}
+              title="Return & review"
+              description="Return the item in good condition at the end of your rental period. Leave a review about your experience to help the community."
+              icon={<Clipboard className="h-6 w-6 text-primary" />}
+            />
+          </div>
         </div>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
-        className="text-center"
-      >
-        <h2 className="text-3xl font-bold text-snaplend-900 mb-4">Ready to Get Started?</h2>
-        <p className="text-lg text-snaplend-600 mb-8 max-w-2xl mx-auto">
-          Join thousands of users who are already saving money and earning extra income through SnapLend.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <Button asChild size="lg">
-            <Link to="/signup">Create an Account</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg">
-            <Link to="/explore">Explore Available Items</Link>
-          </Button>
+        <Separator className="my-16" />
+
+        <div className="mb-16">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Why Choose SnapLend?</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <FeatureItem
+              icon={<ShieldCheck className="h-6 w-6 text-primary" />}
+              title="Trust & Safety"
+              description="Our verification process ensures all users are trustworthy. Rentals are protected by our Trust Agreement and insurance options."
+            />
+            
+            <FeatureItem
+              icon={<CreditCard className="h-6 w-6 text-primary" />}
+              title="Secure Payments"
+              description="All transactions happen through our secure platform. Payment is only released to the owner after you've received the item."
+            />
+            
+            <FeatureItem
+              icon={<Calendar className="h-6 w-6 text-primary" />}
+              title="Flexible Rentals"
+              description="Rent items for as little as a few hours or as long as several months. You decide what works for your needs."
+            />
+            
+            <FeatureItem
+              icon={<MapPin className="h-6 w-6 text-primary" />}
+              title="Local Community"
+              description="Connect with people in your neighborhood. Support the local economy and reduce environmental impact by sharing resources."
+            />
+          </div>
         </div>
-      </motion.div>
+
+        <div className="bg-primary/5 rounded-lg p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Ready to start renting?</h2>
+          <p className="text-snaplend-600 mb-6 max-w-lg mx-auto">
+            Join thousands of people who are already saving money and resources by renting instead of buying.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg">
+              <Link to="/explore">
+                Browse Items <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/create-listing">
+                List Your Items
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
     </Container>
   );
 };

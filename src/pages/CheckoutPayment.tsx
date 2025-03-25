@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Container } from "@/components/ui/container";
@@ -8,17 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
-import { createStripePaymentIntent } from "@/services/stripePaymentService";
+import { Loader2, CheckCircle, XCircle, AlertCircle, CreditCard, Calendar, ShieldCheck } from "lucide-react";
+import { createPaymentIntent } from "@/services/paymentService";
 import { createBooking } from "@/services/bookingService";
 import { useToast } from "@/components/ui/use-toast";
-
-// Define the type for Stripe elements
-declare global {
-  interface Window {
-    Stripe?: any;
-  }
-}
 
 const CheckoutPayment = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
@@ -26,12 +19,11 @@ const CheckoutPayment = () => {
   const location = useLocation();
   const { toast } = useToast();
   
-  // Stripe state
-  const [stripe, setStripe] = useState(null);
-  const [cardElement, setCardElement] = useState(null);
-  const [clientSecret, setClientSecret] = useState("");
-  const [bookingIds, setBookingIds] = useState<string[]>([]);
-  const [paymentIntentId, setPaymentIntentId] = useState("");
+  // Form state
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvc, setCvc] = useState("");
   
   // Process state
   const [processing, setProcessing] = useState(false);
@@ -40,78 +32,23 @@ const CheckoutPayment = () => {
   
   const { shippingDetails } = location.state || {};
   
-  // Initialize Stripe
-  useEffect(() => {
-    if (window.Stripe) {
-      setStripe(window.Stripe('pk_test_51O8NCRSAs3NfRl8adFVS9r3pnhkLtPWdB8nDL5Z2zjOLw2vzUtKQhIbH8nSKq3zXJUcnhIB4pxcErILDmMsZckXx00Hk3CrQEs'));
-    } else {
-      // Load Stripe.js
-      const script = document.createElement('script');
-      script.src = 'https://js.stripe.com/v3/';
-      script.async = true;
-      script.onload = () => {
-        setStripe(window.Stripe('pk_test_51O8NCRSAs3NfRl8adFVS9r3pnhkLtPWdB8nDL5Z2zjOLw2vzUtKQhIbH8nSKq3zXJUcnhIB4pxcErILDmMsZckXx00Hk3CrQEs'));
-      };
-      document.body.appendChild(script);
-    }
-  }, []);
-  
-  // Setup card element when Stripe is loaded
-  useEffect(() => {
-    if (stripe) {
-      const elements = stripe.elements();
-      const card = elements.create('card', {
-        style: {
-          base: {
-            fontSize: '16px',
-            color: '#32325d',
-            fontFamily: 'Arial, sans-serif',
-            '::placeholder': {
-              color: '#aab7c4',
-            },
-          },
-          invalid: {
-            color: '#fa755a',
-            iconColor: '#fa755a',
-          },
-        },
-      });
-      
-      card.mount('#card-element');
-      setCardElement(card);
-      
-      // Handle validation errors
-      card.addEventListener('change', (event) => {
-        const displayError = document.getElementById('card-errors');
-        if (event.error && displayError) {
-          displayError.textContent = event.error.message;
-        } else if (displayError) {
-          displayError.textContent = '';
-        }
-      });
-      
-      return () => {
-        card.unmount();
-      };
-    }
-  }, [stripe]);
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!stripe || !cardElement) {
-      toast({
-        title: "Stripe not loaded",
-        description: "Please wait for the payment system to load",
-        variant: "destructive"
-      });
-      return;
-    }
     
     if (!shippingDetails) {
       toast({
         title: "Missing shipping details",
         description: "Please go back and enter your shipping information",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Basic validation
+    if (!cardNumber || !cardName || !expiry || !cvc) {
+      toast({
+        title: "Incomplete payment details",
+        description: "Please fill in all payment fields",
         variant: "destructive"
       });
       return;
@@ -137,68 +74,81 @@ const CheckoutPayment = () => {
         newBookingIds.push(bookingId);
       }
       
-      setBookingIds(newBookingIds);
-      
-      // Step 2: Create payment intent with Stripe
+      // Step 2: Create payment intent (mock for MVP)
       const totalAmount = getCartTotal();
-      const paymentIntent = await createStripePaymentIntent(newBookingIds[0], totalAmount);
-      setClientSecret(paymentIntent.client_secret);
-      setPaymentIntentId(paymentIntent.id);
+      const paymentIntent = await createPaymentIntent(newBookingIds[0], totalAmount);
       
-      // Step 3: Confirm the payment with Stripe
-      const result = await stripe.confirmCardPayment(paymentIntent.client_secret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: shippingDetails.name || 'Unknown',
-            email: shippingDetails.email || 'unknown@example.com',
-            address: {
-              line1: shippingDetails.address || '',
-              city: shippingDetails.city || '',
-              postal_code: shippingDetails.zipCode || '',
-              country: 'IN',
-            }
-          }
-        }
+      // Step 3: Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // 90% success rate for demo
+      const paymentSuccessful = Math.random() > 0.1;
+      
+      if (!paymentSuccessful) {
+        throw new Error("Payment simulation failed");
+      }
+      
+      // Success!
+      setPaymentStatus("success");
+      
+      // Clear cart after successful payment
+      clearCart();
+      
+      toast({
+        title: "Payment successful!",
+        description: "Your order has been placed successfully.",
+        variant: "default"
       });
       
-      if (result.error) {
-        // Show error to customer
-        setPaymentStatus("error");
-        setErrorMessage(result.error.message || "Payment failed");
-      } else {
-        // The payment succeeded!
-        if (result.paymentIntent.status === 'succeeded') {
-          setPaymentStatus("success");
-          // Clear cart after successful payment
-          clearCart();
-          
-          toast({
-            title: "Payment successful!",
-            description: "Your order has been placed successfully.",
-            variant: "default"
-          });
-          
-          // Redirect to success page after a delay
-          setTimeout(() => {
-            navigate("/payment-success", { 
-              state: { 
-                bookingIds: newBookingIds,
-                totalAmount,
-                paymentIntentId: paymentIntent.id,
-                paymentStatus: 'succeeded'
-              }
-            });
-          }, 2000);
-        }
-      }
+      // Redirect to success page after a delay
+      setTimeout(() => {
+        navigate("/payment-success", { 
+          state: { 
+            bookingIds: newBookingIds,
+            totalAmount,
+            paymentIntentId: paymentIntent.id,
+            paymentStatus: 'succeeded'
+          }
+        });
+      }, 1500);
     } catch (error) {
       console.error("Payment processing error:", error);
       setPaymentStatus("error");
-      setErrorMessage("An unexpected error occurred. Please try again.");
+      setErrorMessage(typeof error === 'object' && error !== null && 'message' in error 
+        ? error.message 
+        : "An unexpected error occurred. Please try again.");
     } finally {
       setProcessing(false);
     }
+  };
+  
+  // Format card number with spaces
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = v.match(/\d{4,16}/g);
+    const match = matches && matches[0] || '';
+    const parts = [];
+    
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+    
+    if (parts.length) {
+      return parts.join(' ');
+    } else {
+      return value;
+    }
+  };
+  
+  // Format expiry date (MM/YY)
+  const formatExpiry = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    
+    if (v.length >= 2) {
+      return `${v.substring(0, 2)}/${v.substring(2, 4)}`;
+    }
+    
+    return v;
   };
   
   if (cartItems.length === 0) {
@@ -229,12 +179,56 @@ const CheckoutPayment = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-4">
-                  <Label htmlFor="card-element">Credit or debit card</Label>
-                  <div className="border rounded-md p-4 bg-white">
-                    {/* Stripe.js will insert the card element here */}
-                    <div id="card-element" className="h-10 flex items-center"></div>
+                  <div>
+                    <Label htmlFor="cardName">Name on card</Label>
+                    <Input 
+                      id="cardName" 
+                      value={cardName} 
+                      onChange={(e) => setCardName(e.target.value)}
+                      placeholder="John Smith"
+                    />
                   </div>
-                  <div id="card-errors" role="alert" className="text-sm text-red-600"></div>
+                  
+                  <div>
+                    <Label htmlFor="cardNumber" className="flex items-center">
+                      Card number
+                      <CreditCard className="ml-2 h-4 w-4 text-gray-400" />
+                    </Label>
+                    <Input 
+                      id="cardNumber" 
+                      value={cardNumber} 
+                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                      placeholder="4242 4242 4242 4242"
+                      maxLength={19}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="expiry" className="flex items-center">
+                        Expiry date
+                        <Calendar className="ml-2 h-4 w-4 text-gray-400" />
+                      </Label>
+                      <Input 
+                        id="expiry" 
+                        value={expiry} 
+                        onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                        placeholder="MM/YY"
+                        maxLength={5}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="cvc">CVC</Label>
+                      <Input 
+                        id="cvc" 
+                        value={cvc} 
+                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, ''))}
+                        placeholder="123"
+                        maxLength={3}
+                        type="password"
+                      />
+                    </div>
+                  </div>
                 </div>
                 
                 {paymentStatus === "error" && (
@@ -247,7 +241,7 @@ const CheckoutPayment = () => {
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={processing || !stripe}
+                  disabled={processing}
                 >
                   {processing ? (
                     <>
@@ -267,8 +261,12 @@ const CheckoutPayment = () => {
                 )}
                 
                 <div className="text-sm text-gray-500 text-center pt-4">
-                  <p>Test Mode: Use card number 4242 4242 4242 4242</p>
-                  <p className="mt-1">Any future date, any 3 digits for CVC, and any postal code.</p>
+                  <div className="flex items-center justify-center mb-2">
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    <p>Secure payment processing</p>
+                  </div>
+                  <p>This is a demo. No real payments will be processed.</p>
+                  <p className="mt-1">Use any card number, future expiry date, and any 3 digits for CVC.</p>
                 </div>
               </form>
             </CardContent>
@@ -329,7 +327,7 @@ const CheckoutPayment = () => {
           <div className="mt-6 text-sm text-gray-600">
             <div className="flex items-start mb-2">
               <AlertCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
-              <p>This is a demo application with Stripe in test mode.</p>
+              <p>This is a demo application with mock payment processing.</p>
             </div>
             <div className="flex items-start">
               <AlertCircle size={16} className="mr-2 mt-0.5 flex-shrink-0" />
