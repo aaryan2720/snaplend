@@ -74,22 +74,25 @@ const UserListings = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing) => (
+            {listings.map((listing: any) => (
               <ListingCard 
                 key={listing.id}
-                id={listing.id}
-                title={listing.title}
-                description={listing.description}
-                price={listing.price}
-                priceUnit={listing.priceUnit || "day"}
-                location={listing.location}
-                image={listing.image_urls?.[0] || "/placeholder.svg"}
-                rating={4.5}
-                reviewCount={0}
-                owner={{
-                  name: "You",
-                  avatar: "/placeholder.svg",
-                  rating: 5
+                listing={{
+                  id: listing.id,
+                  title: listing.title,
+                  description: listing.description,
+                  price: listing.price,
+                  priceUnit: listing.priceUnit || "day",
+                  location: listing.location,
+                  distance: "Near you",
+                  image: listing.image_urls?.[0] || "/placeholder.svg",
+                  rating: 4.5,
+                  reviewCount: 0,
+                  owner: {
+                    name: "You",
+                    avatar: "/placeholder.svg",
+                    rating: 5
+                  }
                 }}
               />
             ))}

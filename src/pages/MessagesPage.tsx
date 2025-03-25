@@ -1,15 +1,15 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Container } from "@/components/ui/container";
 import { useAuth } from "@/contexts/AuthContext";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, MessageSquare, Send, User, Clock } from "lucide-react";
+import { Loader2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
+import ConversationList from "@/components/messages/ConversationList";
+import MessageItem from "@/components/messages/MessageItem";
+import ChatHeader from "@/components/messages/ChatHeader";
+import MessageInput from "@/components/messages/MessageInput";
 
 // Mock data for messages
 const mockConversations = [
@@ -100,7 +100,7 @@ const mockMessages = [
   }
 ];
 
-const formatTime = (date) => {
+const formatTime = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
     minute: 'numeric',
@@ -108,7 +108,7 @@ const formatTime = (date) => {
   }).format(date);
 };
 
-const formatDate = (date) => {
+const formatDate = (date: Date) => {
   const now = new Date();
   const yesterday = new Date(now);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -128,12 +128,12 @@ const formatDate = (date) => {
 const MessagesPage = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [activeConversation, setActiveConversation] = useState(null);
-  const [conversations, setConversations] = useState([]);
-  const [messages, setMessages] = useState([]);
+  const [activeConversation, setActiveConversation] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const { toast } = useToast();
-  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Simulate loading conversations
@@ -159,7 +159,7 @@ const MessagesPage = () => {
     }
   }, [activeConversation]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
     
@@ -193,6 +193,8 @@ const MessagesPage = () => {
     );
   }
 
+  const activeConversationData = conversations.find(c => c.id === activeConversation) || null;
+
   return (
     <Container className="py-12 min-h-screen">
       <div className="max-w-6xl mx-auto">
@@ -216,117 +218,35 @@ const MessagesPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
             {/* Conversations List */}
-            <div className="border rounded-lg overflow-hidden">
-              <div className="p-4 bg-gray-50 border-b">
-                <h2 className="font-medium">Conversations</h2>
-              </div>
-              <div className="overflow-y-auto max-h-[calc(100vh-16rem)]">
-                {conversations.map((convo) => (
-                  <div
-                    key={convo.id}
-                    className={`p-4 border-b hover:bg-gray-50 cursor-pointer ${
-                      activeConversation === convo.id ? 'bg-gray-100' : ''
-                    }`}
-                    onClick={() => setActiveConversation(convo.id)}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <Avatar>
-                        <AvatarImage src={convo.otherUser.avatar} alt={convo.otherUser.name} />
-                        <AvatarFallback>{convo.otherUser.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between">
-                          <p className="font-medium truncate">{convo.otherUser.name}</p>
-                          <span className="text-xs text-gray-500">
-                            {formatDate(convo.lastMessage.timestamp)}
-                          </span>
-                        </div>
-                        <p className={`text-sm truncate ${convo.lastMessage.unread ? 'font-medium' : 'text-gray-500'}`}>
-                          {convo.lastMessage.text}
-                        </p>
-                        <p className="text-xs text-primary mt-1 truncate">
-                          Re: {convo.listing.title}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ConversationList 
+              conversations={conversations}
+              activeConversation={activeConversation}
+              setActiveConversation={(id) => setActiveConversation(id)}
+              formatDate={formatDate}
+            />
 
             {/* Chat Area */}
             <div className="md:col-span-2 border rounded-lg flex flex-col">
               {activeConversation ? (
                 <>
-                  <div className="p-4 bg-gray-50 border-b flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Avatar className="h-8 w-8 mr-2">
-                        <AvatarImage 
-                          src={conversations.find(c => c.id === activeConversation)?.otherUser.avatar} 
-                          alt={conversations.find(c => c.id === activeConversation)?.otherUser.name} 
-                        />
-                        <AvatarFallback>
-                          {conversations.find(c => c.id === activeConversation)?.otherUser.name[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-medium">
-                          {conversations.find(c => c.id === activeConversation)?.otherUser.name}
-                        </h3>
-                        <p className="text-xs text-gray-500">
-                          Re: {conversations.find(c => c.id === activeConversation)?.listing.title}
-                        </p>
-                      </div>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      asChild
-                    >
-                      <Link to={`/item/${conversations.find(c => c.id === activeConversation)?.listing.id}`}>
-                        View Listing
-                      </Link>
-                    </Button>
-                  </div>
+                  <ChatHeader conversation={activeConversationData} />
                   
                   <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
                     {messages.map((message) => (
-                      <div 
-                        key={message.id}
-                        className={`flex ${message.senderId === 'currentUser' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div 
-                          className={`max-w-[80%] p-3 rounded-lg ${
-                            message.senderId === 'currentUser' 
-                              ? 'bg-primary text-white rounded-br-none' 
-                              : 'bg-white border rounded-bl-none'
-                          }`}
-                        >
-                          <p>{message.text}</p>
-                          <p className={`text-xs mt-1 text-right ${
-                            message.senderId === 'currentUser' ? 'text-primary-foreground/80' : 'text-gray-500'
-                          }`}>
-                            {formatTime(message.timestamp)}
-                          </p>
-                        </div>
-                      </div>
+                      <MessageItem 
+                        key={message.id} 
+                        message={message} 
+                        formatTime={formatTime} 
+                      />
                     ))}
                     <div ref={messagesEndRef} />
                   </div>
                   
-                  <form onSubmit={handleSendMessage} className="p-3 border-t bg-white">
-                    <div className="flex space-x-2">
-                      <Input
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type a message..."
-                        className="flex-1"
-                      />
-                      <Button type="submit" size="icon">
-                        <Send size={18} />
-                      </Button>
-                    </div>
-                  </form>
+                  <MessageInput 
+                    newMessage={newMessage}
+                    setNewMessage={setNewMessage}
+                    handleSendMessage={handleSendMessage}
+                  />
                 </>
               ) : (
                 <div className="flex items-center justify-center h-full">

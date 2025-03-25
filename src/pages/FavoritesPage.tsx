@@ -72,19 +72,22 @@ const FavoritesPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {favorites.map((favorite) => (
+            {favorites.map((favorite: any) => (
               <ListingCard 
-                key={favorite.id} 
-                id={favorite.listing.id}
-                title={favorite.listing.title}
-                description={favorite.listing.description}
-                price={favorite.listing.price}
-                priceUnit={favorite.listing.priceUnit}
-                location={favorite.listing.location}
-                image={favorite.listing.image}
-                rating={favorite.listing.rating}
-                reviewCount={favorite.listing.reviewCount}
-                owner={favorite.listing.owner}
+                key={favorite.id}
+                listing={{
+                  id: favorite.listing.id,
+                  title: favorite.listing.title,
+                  description: favorite.listing.description,
+                  price: favorite.listing.price,
+                  priceUnit: favorite.listing.priceUnit,
+                  location: favorite.listing.location,
+                  distance: "Near you",
+                  image: favorite.listing.image,
+                  rating: favorite.listing.rating,
+                  reviewCount: favorite.listing.reviewCount,
+                  owner: favorite.listing.owner
+                }} 
               />
             ))}
           </div>
