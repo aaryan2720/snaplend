@@ -10,11 +10,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/CartContext";
-import { ShoppingCart, Loader2, ShoppingBag } from "lucide-react";
+import { ShoppingCart, Loader2, ShoppingBag, Star, ThumbsUp, Smile, Heart, ThumbsDown, Frown, Meh } from "lucide-react";
 import { useState } from "react";
 import CartItems from "./CartItems";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const CartButton = () => {
   const { getItemCount, getCartTotal, clearCart } = useCart();
@@ -31,6 +32,15 @@ const CartButton = () => {
       navigate("/checkout");
       setIsCheckingOut(false);
     }, 800);
+  };
+
+  // Helper function to render rating icon based on rating value
+  const getRatingIcon = (rating: number) => {
+    if (rating >= 4.5) return <ThumbsUp size={16} className="text-green-500" />;
+    if (rating >= 3.5) return <Smile size={16} className="text-green-400" />;
+    if (rating >= 2.5) return <Meh size={16} className="text-yellow-500" />;
+    if (rating >= 1.5) return <Frown size={16} className="text-orange-500" />;
+    return <ThumbsDown size={16} className="text-red-500" />;
   };
 
   return (
@@ -55,11 +65,14 @@ const CartButton = () => {
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-md flex flex-col">
         <SheetHeader>
-          <SheetTitle>Your Cart ({itemCount} items)</SheetTitle>
+          <SheetTitle className="flex items-center">
+            <ShoppingCart size={18} className="mr-2" />
+            Your Cart ({itemCount} items)
+          </SheetTitle>
         </SheetHeader>
         
         <div className="mt-8 flex-1 overflow-auto">
-          <CartItems />
+          <CartItems getRatingIcon={getRatingIcon} />
         </div>
         
         {itemCount > 0 && (
@@ -95,6 +108,12 @@ const CartButton = () => {
                 >
                   Clear Cart
                 </Button>
+              </div>
+              <div className="text-center text-sm text-gray-500 mt-4">
+                By proceeding to checkout, you agree to our{" "}
+                <Link to="/terms" className="text-primary hover:underline" onClick={() => setIsOpen(false)}>
+                  Terms and Conditions
+                </Link>
               </div>
             </div>
           </SheetFooter>

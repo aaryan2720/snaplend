@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
@@ -184,12 +183,31 @@ const PaymentSuccess = () => {
                 </div>
                 
                 <div className="mt-6">
-                  <ReceiptTemplate
-                    bookingIds={bookingIds}
-                    totalAmount={totalAmount}
-                    paymentIntentId={paymentIntentId || "TXN12345678"}
-                    paymentDate={new Date()}
-                  />
+                  <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
+                    <h3 className="text-lg font-medium mb-4">Receipt</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Item:</span>
+                        <span className="font-medium">{receiptData?.itemName}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Duration:</span>
+                        <span className="font-medium">{receiptData?.duration}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Amount:</span>
+                        <span className="font-medium">₹{receiptData?.amount}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Payment ID:</span>
+                        <span className="font-medium">{receiptData?.paymentId}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Date:</span>
+                        <span className="font-medium">{receiptData?.date}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-center space-x-3 pt-6">

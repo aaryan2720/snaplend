@@ -1,4 +1,3 @@
-
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +26,7 @@ import SignUp from "./pages/SignUp";
 import UserBookings from "./pages/UserBookings";
 import UserListings from "./pages/UserListings";
 import UserProfile from "./pages/UserProfile";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const queryClient = new QueryClient();
 
@@ -98,6 +98,7 @@ const AppRoutes = () => (
         </ProtectedRoute>
       } 
     />
+    <Route path="/terms" element={<TermsAndConditions />} />
     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
     <Route path="*" element={<NotFound />} />
   </Routes>
