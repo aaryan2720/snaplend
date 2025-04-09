@@ -1,4 +1,3 @@
-
 import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
 import { getDefaultAvatar } from "@/services/profileService";
@@ -31,6 +30,7 @@ interface DbListing {
   availability_start?: string;
   availability_end?: string;
   is_active?: boolean;
+  is_sold?: boolean;
   created_at: string;
   updated_at: string;
   profiles?: {
@@ -47,7 +47,8 @@ const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
     id: dbListing.profiles?.id,
     name: dbListing.profiles?.full_name || "Anonymous User",
     avatar: dbListing.profiles?.avatar_url || getDefaultAvatar(dbListing.profiles?.gender),
-    rating: 4.5 // Default rating for now, can be calculated from reviews later
+    rating: 0,
+    gender: dbListing.profiles?.gender
   };
 
   // Process image URLs - check if they're full URLs or storage paths
@@ -76,14 +77,16 @@ const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
     priceUnit: "day" as "hour" | "day" | "week" | "month", // Ensure type is correct
     location: dbListing.location,
     distance: "Near you", // This would need to be calculated based on user's location
-    rating: 4.5, // Default value, should be calculated from reviews
+    rating: 0, // Default value for rating
     reviewCount: 0, // Default value, should be counted from reviews
     image: imageUrl,
     image_urls: dbListing.image_urls,
     additionalImages,
     owner,
     featured: false, // Default value, can be set based on some criteria later
-    category: dbListing.category
+    category: dbListing.category,
+    isSold: dbListing.is_sold || false,
+    owner_id: dbListing.owner_id
   };
 };
 
@@ -97,7 +100,8 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
         profiles:owner_id (
           id,
           full_name,
-          avatar_url
+          avatar_url,
+          gender
         )
       `)
       .eq('is_active', true);
@@ -136,7 +140,8 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
       return null;
     }
 
-    return mapDbListingToFrontend(data as DbListing);
+    const dbListing = data as unknown as DbListing;
+    return mapDbListingToFrontend(dbListing);
   } catch (err) {
     console.error(`Exception fetching listing with ID ${id}:`, err);
     return null;
@@ -156,7 +161,8 @@ export const createListing = async (listing: CreateListingPayload): Promise<stri
       .insert({
         ...listing,
         owner_id: userData.user.id,
-        is_active: true
+        is_active: true,
+        is_sold: false
       })
       .select()
       .single();
@@ -174,7 +180,7 @@ export const createListing = async (listing: CreateListingPayload): Promise<stri
 };
 
 // Update a listing
-export const updateListing = async (id: string, updates: Partial<CreateListingPayload>): Promise<boolean> => {
+export const updateListing = async (id: string, updates: Partial<CreateListingPayload & { is_sold?: boolean }>): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('listings')
@@ -193,12 +199,12 @@ export const updateListing = async (id: string, updates: Partial<CreateListingPa
   }
 };
 
-// Delete a listing (or mark as inactive)
+// Delete a listing (actual deletion, not just marking inactive)
 export const deleteListing = async (id: string): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('listings')
-      .update({ is_active: false })
+      .delete()
       .eq('id', id);
 
     if (error) {
@@ -213,6 +219,11 @@ export const deleteListing = async (id: string): Promise<boolean> => {
   }
 };
 
+// Mark a listing as sold
+export const markListingAsSold = async (id: string): Promise<boolean> => {
+  return await updateListing(id, { is_sold: true });
+};
+
 // Fetch listings by owner ID
 export const getUserListings = async (userId: string): Promise<any[]> => {
   try {
@@ -225,7 +236,8 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
         profiles:owner_id (
           id,
           full_name,
-          avatar_url
+          avatar_url,
+          gender
         )
       `)
       .eq('owner_id', userId);
@@ -247,7 +259,8 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
           location: 'Indiranagar, Bangalore',
           image_urls: ['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000&h=800'],
           created_at: new Date().toISOString(),
-          category: 'electronics'
+          category: 'electronics',
+          is_sold: false
         },
         {
           id: 'l2',
@@ -258,12 +271,13 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
           location: 'Koramangala, Bangalore',
           image_urls: ['https://images.unsplash.com/photo-1545714968-62a0bf2c033d?auto=format&fit=crop&q=80&w=1000&h=800'],
           created_at: new Date().toISOString(),
-          category: 'sports'
+          category: 'sports',
+          is_sold: false
         }
       ];
     }
 
-    return data;
+    return (data as DbListing[]).map(mapDbListingToFrontend);
   } catch (err) {
     console.error("Exception fetching user listings:", err);
     return [];
@@ -280,10 +294,12 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
         profiles:owner_id (
           id,
           full_name,
-          avatar_url
+          avatar_url,
+          gender
         )
       `)
       .eq('is_active', true)
+      .eq('is_sold', false)
       .order('created_at', { ascending: false })
       .limit(4);
 
@@ -317,13 +333,13 @@ export const getDefaultListings = (): ListingProps[] => {
       priceUnit: "day",
       location: 'Indiranagar, Bangalore',
       distance: '2.5 km',
-      rating: 4.8,
-      reviewCount: 24,
+      rating: 0,
+      reviewCount: 0,
       image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000&h=800',
       owner: {
         name: 'Rahul M.',
         avatar: 'https://i.pravatar.cc/150?img=68',
-        rating: 4.9
+        rating: 0
       },
       featured: true
     },
@@ -335,13 +351,13 @@ export const getDefaultListings = (): ListingProps[] => {
       priceUnit: "day",
       location: 'Koramangala, Bangalore',
       distance: '3.8 km',
-      rating: 4.6,
-      reviewCount: 18,
+      rating: 0,
+      reviewCount: 0,
       image: 'https://images.unsplash.com/photo-1545714968-62a0bf2c033d?auto=format&fit=crop&q=80&w=1000&h=800',
       owner: {
         name: 'Priya S.',
         avatar: 'https://i.pravatar.cc/150?img=47',
-        rating: 4.7
+        rating: 0
       },
       featured: true
     },
@@ -353,13 +369,13 @@ export const getDefaultListings = (): ListingProps[] => {
       priceUnit: "day",
       location: 'HSR Layout, Bangalore',
       distance: '5.2 km',
-      rating: 4.8,
-      reviewCount: 12,
+      rating: 0,
+      reviewCount: 0,
       image: 'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800',
       owner: {
         name: 'Vikram S.',
         avatar: 'https://i.pravatar.cc/150?img=67',
-        rating: 4.9
+        rating: 0
       },
       featured: true
     },
@@ -371,13 +387,13 @@ export const getDefaultListings = (): ListingProps[] => {
       priceUnit: "day",
       location: 'Whitefield, Bangalore',
       distance: '7.5 km',
-      rating: 4.6,
-      reviewCount: 8,
+      rating: 0,
+      reviewCount: 0,
       image: 'https://images.unsplash.com/photo-1588416499018-d8c952dc4554?auto=format&fit=crop&q=80&w=1000&h=800',
       owner: {
         name: 'Arjun P.',
         avatar: 'https://i.pravatar.cc/150?img=59',
-        rating: 4.7
+        rating: 0
       },
       featured: true
     }
@@ -405,12 +421,12 @@ export const getFavorites = async (): Promise<any[]> => {
         priceUnit: 'day',
         location: 'HSR Layout, Bangalore',
         image: 'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800',
-        rating: 4.8,
-        reviewCount: 12,
+        rating: 0,
+        reviewCount: 0,
         owner: {
           name: 'Vikram S.',
           avatar: 'https://i.pravatar.cc/150?img=67',
-          rating: 4.9
+          rating: 0
         }
       }
     },
@@ -425,12 +441,12 @@ export const getFavorites = async (): Promise<any[]> => {
         priceUnit: 'day',
         location: 'Whitefield, Bangalore',
         image: 'https://images.unsplash.com/photo-1588416499018-d8c952dc4554?auto=format&fit=crop&q=80&w=1000&h=800',
-        rating: 4.6,
-        reviewCount: 8,
+        rating: 0,
+        reviewCount: 0,
         owner: {
           name: 'Arjun P.',
           avatar: 'https://i.pravatar.cc/150?img=59',
-          rating: 4.7
+          rating: 0
         }
       }
     }

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, Home } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ItemDetailContent from "@/components/ItemDetailContent";
@@ -44,8 +44,13 @@ const ItemDetail = () => {
             if (resultListing.owner) {
               if (!resultListing.owner.avatar || resultListing.owner.avatar === "https://i.pravatar.cc/150?img=32") {
                 // Use gender-appropriate avatar if possible
-                const gender = data.profiles?.gender || 'unspecified';
+                const gender = data.owner?.gender || 'unspecified';
                 resultListing.owner.avatar = getDefaultAvatar(gender);
+              }
+              
+              // Set default rating to 0 if not provided
+              if (resultListing.owner.rating === undefined || resultListing.owner.rating === null) {
+                resultListing.owner.rating = 0;
               }
             }
             
@@ -82,6 +87,12 @@ const ItemDetail = () => {
             <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
             <p className="mt-4 text-gray-600">Loading item details...</p>
           </div>
+          <Button variant="outline" className="fixed top-20 right-6" asChild>
+            <Link to="/">
+              <Home className="mr-2 h-4 w-4" />
+              Return to Home
+            </Link>
+          </Button>
         </Container>
         <Footer />
       </>
@@ -97,7 +108,10 @@ const ItemDetail = () => {
             <h1 className="text-2xl font-bold mb-4">Item Not Found</h1>
             <p className="text-gray-600 mb-8">The item you're looking for doesn't exist or has been removed.</p>
             <Button asChild>
-              <Link to="/">Return to Home</Link>
+              <Link to="/">
+                <Home className="mr-2 h-4 w-4" />
+                Return to Home
+              </Link>
             </Button>
           </div>
         </Container>
@@ -111,6 +125,12 @@ const ItemDetail = () => {
       <Navbar />
       <Container className="py-12 min-h-screen">
         <div className="max-w-6xl mx-auto">
+          <Button variant="outline" className="mb-6" asChild>
+            <Link to="/">
+              <Home className="mr-2 h-4 w-4" />
+              Return to Home
+            </Link>
+          </Button>
           <ItemDetailContent listing={listing} />
         </div>
       </Container>

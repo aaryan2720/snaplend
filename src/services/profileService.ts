@@ -74,12 +74,18 @@ export const ensureUserProfile = async (): Promise<string | null> => {
   const defaultName = userData.user.email?.split('@')[0] || 'User';
   const gender = userData.user.user_metadata?.gender || 'unspecified';
   
+  // Generate a unique avatar for this user based on their email
+  const emailHash = userData.user.email ? 
+    userData.user.email.split('@')[0].charAt(0).toLowerCase() : 'a';
+  const uniqueAvatarId = emailHash.charCodeAt(0) % 100;
+  const defaultAvatar = getDefaultAvatar(gender, uniqueAvatarId);
+  
   const { data: newProfile, error } = await supabase
     .from('profiles')
     .insert({
       id: userData.user.id,
       full_name: userData.user.user_metadata?.full_name || defaultName,
-      avatar_url: null,
+      avatar_url: defaultAvatar,
       gender: gender
     })
     .select()
@@ -93,14 +99,23 @@ export const ensureUserProfile = async (): Promise<string | null> => {
   return newProfile.id;
 };
 
-// Get appropriate default avatar based on gender
-export const getDefaultAvatar = (gender?: string): string => {
+// Get appropriate default avatar based on gender and a unique identifier
+export const getDefaultAvatar = (gender?: string, uniqueId?: number): string => {
+  // Use the uniqueId to select different avatars for different users
+  const id = uniqueId !== undefined ? uniqueId : Math.floor(Math.random() * 100);
+  
   if (gender === 'female') {
-    return 'https://i.pravatar.cc/150?img=44'; // Female avatar
+    const femaleAvatars = [44, 45, 46, 47, 48, 49, 11, 12, 13, 14];
+    const index = id % femaleAvatars.length;
+    return `https://i.pravatar.cc/150?img=${femaleAvatars[index]}`;
   } else if (gender === 'male') {
-    return 'https://i.pravatar.cc/150?img=68'; // Male avatar
+    const maleAvatars = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
+    const index = id % maleAvatars.length;
+    return `https://i.pravatar.cc/150?img=${maleAvatars[index]}`;
   } else {
-    return 'https://i.pravatar.cc/150?img=33'; // Neutral avatar
+    const neutralAvatars = [33, 34, 35, 36, 37, 38, 39, 40, 41, 42];
+    const index = id % neutralAvatars.length;
+    return `https://i.pravatar.cc/150?img=${neutralAvatars[index]}`;
   }
 };
 

@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Star, Heart, MapPin, Calendar, User, ExternalLink, Plus, ChevronRight } from "lucide-react";
+import { ShoppingCart, Star, Heart, MapPin, Calendar, User, ExternalLink, Plus, ChevronRight, Home, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,16 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Avatar } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { deleteListing } from "@/services/listingService";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface Owner {
-  id?: string; // Added id property
+  id?: string;
   name: string;
   avatar: string;
   rating: number;
+  gender?: string;
 }
 
 export interface ListingProps {
@@ -33,21 +37,27 @@ export interface ListingProps {
   owner: Owner;
   featured?: boolean;
   category?: string;
+  isSold?: boolean;
+  owner_id?: string;
 }
 
 interface ListingCardProps {
   listing: ListingProps;
   className?: string;
   style?: React.CSSProperties;
+  onDelete?: () => void;
 }
 
-const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) => {
+const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style, onDelete }) => {
   const { addToCart } = useCart();
   const [isLiked, setIsLiked] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
+  const { user } = useAuth();
+  const { toast } = useToast();
   
   const unitDisplay = {
     hour: "hr",
@@ -64,6 +74,41 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
     
     addToCart(listing);
   };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (window.confirm("Are you sure you want to delete this listing?")) {
+      setIsDeleting(true);
+      try {
+        const success = await deleteListing(listing.id);
+        if (success) {
+          toast({
+            title: "Success",
+            description: "Listing deleted successfully",
+          });
+          if (onDelete) onDelete();
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to delete listing",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error("Error deleting listing:", error);
+        toast({
+          title: "Error",
+          description: "An error occurred while deleting the listing",
+          variant: "destructive"
+        });
+      }
+      setIsDeleting(false);
+    }
+  };
+  
+  const isOwner = user && listing.owner_id && user.id === listing.owner_id;
   
   return (
     <motion.div
@@ -109,6 +154,14 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
             Featured
           </div>
         )}
+
+        {listing.isSold && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <span className="bg-red-500 text-white px-6 py-3 rounded-full text-xl font-bold transform rotate-12 shadow-lg">
+              SOLD
+            </span>
+          </div>
+        )}
         
         <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm flex items-center">
           <Avatar className="h-6 w-6 border border-white mr-2">
@@ -123,8 +176,8 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
           <div className="flex items-center">
             <div className="bg-amber-50 px-2 py-1 rounded-full flex items-center">
               <Star className="mr-1 h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span className="font-medium text-sm">{listing.rating}</span>
-              <span className="ml-1 text-xs text-gray-500">({listing.reviewCount})</span>
+              <span className="font-medium text-sm">{listing.rating || 0}</span>
+              <span className="ml-1 text-xs text-gray-500">({listing.reviewCount || 0})</span>
             </div>
           </div>
           <div className="flex items-center text-gray-500 text-xs">
@@ -158,25 +211,49 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing, className, style }) 
             </div>
           </div>
           
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={handleAddToCart}
-            className="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition-colors"
-          >
-            <ShoppingCart size={18} />
-          </motion.button>
+          <div className="flex space-x-2">
+            {isOwner && (
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="bg-red-50 text-red-600 hover:bg-red-100 p-2 rounded-full transition-colors"
+              >
+                {isDeleting ? <Loader2 className="animate-spin" size={18} /> : <Trash2 size={18} />}
+              </motion.button>
+            )}
+            
+            {!listing.isSold && (
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={handleAddToCart}
+                className="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 p-2 rounded-full transition-colors"
+              >
+                <ShoppingCart size={18} />
+              </motion.button>
+            )}
+          </div>
         </div>
         
         <div className="mt-4 pt-4 border-t border-gray-100">
-          <Link to={`/item/${listing.id}`}>
-            <Button 
-              variant="default" 
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-sm"
-            >
-              <span>View Details</span>
-              <ChevronRight size={16} className="ml-1" />
-            </Button>
-          </Link>
+          <div className="flex justify-between">
+            <Link to="/">
+              <Button variant="outline" size="sm" className="text-gray-600">
+                <Home size={16} className="mr-1" />
+                Home
+              </Button>
+            </Link>
+            
+            <Link to={`/item/${listing.id}`}>
+              <Button 
+                variant="default" 
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white shadow-sm"
+              >
+                <span>View Details</span>
+                <ChevronRight size={16} className="ml-1" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </motion.div>

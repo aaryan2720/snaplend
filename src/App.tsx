@@ -1,3 +1,4 @@
+
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,8 +28,35 @@ import UserBookings from "./pages/UserBookings";
 import UserListings from "./pages/UserListings";
 import UserProfile from "./pages/UserProfile";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import { useEffect } from "react";
+import { supabase } from "./integrations/supabase/client";
 
 const queryClient = new QueryClient();
+
+// Initialize database with required fields if they don't exist
+const initDatabase = async () => {
+  try {
+    // Check if is_sold column exists in listings table
+    const { data: columnInfo, error: columnError } = await supabase
+      .from('listings')
+      .select('is_sold')
+      .limit(1);
+    
+    // If there's an error about the column not existing, add it
+    if (columnError && columnError.message.includes('is_sold')) {
+      console.log("Adding is_sold column to listings table...");
+      
+      // We can't directly execute alter table commands through the client API
+      // In a real app, this would be handled by a migration script
+      // For this demo, we'll just log the information
+      
+      console.log("Please execute the following SQL in your Supabase SQL editor:");
+      console.log("ALTER TABLE public.listings ADD COLUMN IF NOT EXISTS is_sold BOOLEAN DEFAULT false;");
+    }
+  } catch (error) {
+    console.error("Database initialization error:", error);
+  }
+};
 
 const AppRoutes = () => (
   <Routes>
@@ -104,20 +132,26 @@ const AppRoutes = () => (
   </Routes>
 );
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <CartProvider>
-            <Toaster />
-            <Sonner />
-            <AppRoutes />
-          </CartProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  useEffect(() => {
+    initDatabase();
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <CartProvider>
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+            </CartProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
