@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export interface UserProfile {
@@ -7,6 +8,7 @@ export interface UserProfile {
   phone: string | null;
   created_at: string;
   updated_at: string;
+  gender?: string;
 }
 
 // Fetch the current user's profile
@@ -70,13 +72,15 @@ export const ensureUserProfile = async (): Promise<string | null> => {
   // Otherwise, create a new profile
   const { data: userData } = user;
   const defaultName = userData.user.email?.split('@')[0] || 'User';
+  const gender = userData.user.user_metadata?.gender || 'unspecified';
   
   const { data: newProfile, error } = await supabase
     .from('profiles')
     .insert({
       id: userData.user.id,
-      full_name: defaultName,
+      full_name: userData.user.user_metadata?.full_name || defaultName,
       avatar_url: null,
+      gender: gender
     })
     .select()
     .single();
@@ -87,6 +91,17 @@ export const ensureUserProfile = async (): Promise<string | null> => {
   }
 
   return newProfile.id;
+};
+
+// Get appropriate default avatar based on gender
+export const getDefaultAvatar = (gender?: string): string => {
+  if (gender === 'female') {
+    return 'https://i.pravatar.cc/150?img=44'; // Female avatar
+  } else if (gender === 'male') {
+    return 'https://i.pravatar.cc/150?img=68'; // Male avatar
+  } else {
+    return 'https://i.pravatar.cc/150?img=33'; // Neutral avatar
+  }
 };
 
 // Upload user avatar
@@ -100,23 +115,36 @@ export const uploadAvatar = async (file: File): Promise<string> => {
   const fileName = `${user.data.user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
   const filePath = `avatars/${fileName}`;
 
-  // Upload the file
-  const { error: uploadError } = await supabase.storage
-    .from('user-content')
-    .upload(filePath, file);
+  try {
+    // Upload the file
+    const { error: uploadError } = await supabase.storage
+      .from('user-content')
+      .upload(filePath, file);
 
-  if (uploadError) {
-    console.error("Error uploading avatar:", uploadError);
-    throw uploadError;
+    if (uploadError) {
+      console.error("Error uploading avatar:", uploadError);
+      throw uploadError;
+    }
+
+    // Get the public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('user-content')
+      .getPublicUrl(filePath);
+
+    // Update the user's profile with the new avatar URL
+    await updateUserProfile({ avatar_url: publicUrl });
+
+    return publicUrl;
+  } catch (error) {
+    console.error("Avatar upload failed:", error);
+    
+    // Get user profile to determine gender for fallback avatar
+    const profile = await fetchUserProfile();
+    const defaultAvatar = getDefaultAvatar(profile?.gender);
+    
+    // Still update the profile with default avatar if upload fails
+    await updateUserProfile({ avatar_url: defaultAvatar });
+    
+    return defaultAvatar;
   }
-
-  // Get the public URL
-  const { data: { publicUrl } } = supabase.storage
-    .from('user-content')
-    .getPublicUrl(filePath);
-
-  // Update the user's profile with the new avatar URL
-  await updateUserProfile({ avatar_url: publicUrl });
-
-  return publicUrl;
 };

@@ -1,6 +1,7 @@
 
 import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
+import { getDefaultAvatar } from "@/services/profileService";
 
 // Type for creating a new listing
 export interface CreateListingPayload {
@@ -36,14 +37,16 @@ interface DbListing {
     id: string;
     full_name: string | null;
     avatar_url: string | null;
+    gender?: string;
   };
 }
 
 // Convert database listing to frontend listing format
 const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
   const owner: Owner = {
+    id: dbListing.profiles?.id,
     name: dbListing.profiles?.full_name || "Anonymous User",
-    avatar: dbListing.profiles?.avatar_url || "https://i.pravatar.cc/150?img=32", // Default avatar
+    avatar: dbListing.profiles?.avatar_url || getDefaultAvatar(dbListing.profiles?.gender),
     rating: 4.5 // Default rating for now, can be calculated from reviews later
   };
 
@@ -121,7 +124,8 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
         profiles:owner_id (
           id,
           full_name,
-          avatar_url
+          avatar_url,
+          gender
         )
       `)
       .eq('id', id)

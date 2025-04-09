@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { getDefaultAvatar } from "@/services/profileService";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +45,9 @@ const UserMenu = () => {
     );
   }
 
+  // Get appropriate avatar based on profile
+  const avatarSrc = profile?.avatar_url || getDefaultAvatar(profile?.gender);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -53,9 +57,9 @@ const UserMenu = () => {
         >
           <div className="flex items-center pr-1">
             <div className="w-8 h-8 rounded-full bg-snaplend-200 flex items-center justify-center overflow-hidden">
-              {profile?.avatar_url ? (
+              {avatarSrc ? (
                 <img 
-                  src={profile.avatar_url} 
+                  src={avatarSrc} 
                   alt={profile?.full_name || user.email || "User"} 
                   className="w-full h-full object-cover"
                 />
@@ -67,6 +71,7 @@ const UserMenu = () => {
           </div>
         </Button>
       </DropdownMenuTrigger>
+      
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">

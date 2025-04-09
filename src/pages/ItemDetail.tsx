@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ItemDetailContent from "@/components/ItemDetailContent";
+import { getDefaultAvatar } from "@/services/profileService";
 
 const ItemDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,6 +38,15 @@ const ItemDetail = () => {
               resultListing.additionalImages = data.image_urls.slice(1).map(url => {
                 return url.startsWith('http') ? url : `https://aklactzqyglyzkvwugjm.supabase.co/storage/v1/object/public/listings/${url}`;
               });
+            }
+            
+            // Ensure owner has an appropriate avatar based on profile
+            if (resultListing.owner) {
+              if (!resultListing.owner.avatar || resultListing.owner.avatar === "https://i.pravatar.cc/150?img=32") {
+                // Use gender-appropriate avatar if possible
+                const gender = data.profiles?.gender || 'unspecified';
+                resultListing.owner.avatar = getDefaultAvatar(gender);
+              }
             }
             
             setListing(resultListing);
