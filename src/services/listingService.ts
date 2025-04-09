@@ -60,6 +60,11 @@ const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
     }
   }
 
+  // Process additional images if available
+  const additionalImages = dbListing.image_urls && dbListing.image_urls.length > 1 
+    ? dbListing.image_urls.slice(1).map(url => url.startsWith('http') ? url : getStorageUrl('listings', url))
+    : [];
+
   return {
     id: dbListing.id,
     title: dbListing.title,
@@ -71,8 +76,11 @@ const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
     rating: 4.5, // Default value, should be calculated from reviews
     reviewCount: 0, // Default value, should be counted from reviews
     image: imageUrl,
+    image_urls: dbListing.image_urls,
+    additionalImages,
     owner,
-    featured: false // Default value, can be set based on some criteria later
+    featured: false, // Default value, can be set based on some criteria later
+    category: dbListing.category
   };
 };
 

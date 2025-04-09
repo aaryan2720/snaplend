@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
@@ -7,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
-import { AlertCircle, Calendar, CheckCircle, CreditCard, Loader2, ShieldCheck, XCircle } from "lucide-react";
+import { AlertCircle, Calendar, CheckCircle, CreditCard, Loader2, ShieldCheck, XCircle, PartyPopper } from "lucide-react";
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 
 const CheckoutPayment = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
@@ -56,28 +57,43 @@ const CheckoutPayment = () => {
     setPaymentStatus("processing");
     
     try {
-      // Calculate total amount including shipping and tax
-      const totalAmount = getCartTotal() + 49 + Math.round(getCartTotal() * 0.18);
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Generate a mock client secret (in production this would come from your backend)
-      const mockClientSecret = 'mock_' + Math.random().toString(36).substr(2, 9);
-
-      // Navigate to payment page with necessary details
-      navigate("/payment", {
-        state: {
-          amount: totalAmount,
-          clientSecret: mockClientSecret
-        }
+      // Show success animation
+      setPaymentStatus("success");
+      
+      // Launch confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
       });
       
-      setPaymentStatus("success");
-      clearCart(); // Clear the cart after successful navigation
+      // Clear the cart after successful payment
+      clearCart();
+      
+      // Show success message
+      toast({
+        title: "Payment successful!",
+        description: "Your order has been placed successfully",
+        variant: "default",
+      });
+      
+      // Wait for animation and then redirect
+      setTimeout(() => {
+        navigate("/payment", {
+          state: {
+            success: true,
+            amount: getCartTotal() + 49 + Math.round(getCartTotal() * 0.18),
+          }
+        });
+      }, 2000);
+      
     } catch (error) {
-      console.error("Booking creation error:", error);
+      console.error("Payment error:", error);
       setPaymentStatus("error");
-      setErrorMessage(typeof error === 'object' && error !== null && 'message' in error 
-        ? error.message 
-        : "An unexpected error occurred. Please try again.");
+      setErrorMessage("An error occurred during payment processing. Please try again.");
     } finally {
       setProcessing(false);
     }
@@ -138,98 +154,112 @@ const CheckoutPayment = () => {
             </CardHeader>
             
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="cardName">Name on card</Label>
-                    <Input 
-                      id="cardName" 
-                      value={cardName} 
-                      onChange={(e) => setCardName(e.target.value)}
-                      placeholder="John Smith"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="cardNumber" className="flex items-center">
-                      Card number
-                      <CreditCard className="ml-2 h-4 w-4 text-gray-400" />
-                    </Label>
-                    <Input 
-                      id="cardNumber" 
-                      value={cardNumber} 
-                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                      placeholder="4242 4242 4242 4242"
-                      maxLength={19}
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
+              {paymentStatus === "success" ? (
+                <motion.div 
+                  className="flex flex-col items-center justify-center py-8"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="bg-green-100 rounded-full p-4 mb-4"
+                  >
+                    <PartyPopper size={50} className="text-green-600" />
+                  </motion.div>
+                  <h2 className="text-2xl font-bold text-center mb-2">Payment Successful!</h2>
+                  <p className="text-gray-600 text-center mb-6">Thank you for your order.</p>
+                  <p className="text-gray-600 text-center">Redirecting to confirmation page...</p>
+                </motion.div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-4">
                     <div>
-                      <Label htmlFor="expiry" className="flex items-center">
-                        Expiry date
-                        <Calendar className="ml-2 h-4 w-4 text-gray-400" />
+                      <Label htmlFor="cardName">Name on card</Label>
+                      <Input 
+                        id="cardName" 
+                        value={cardName} 
+                        onChange={(e) => setCardName(e.target.value)}
+                        placeholder="John Smith"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="cardNumber" className="flex items-center">
+                        Card number
+                        <CreditCard className="ml-2 h-4 w-4 text-gray-400" />
                       </Label>
                       <Input 
-                        id="expiry" 
-                        value={expiry} 
-                        onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                        placeholder="MM/YY"
-                        maxLength={5}
+                        id="cardNumber" 
+                        value={cardNumber} 
+                        onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                        placeholder="4242 4242 4242 4242"
+                        maxLength={19}
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="cvc">CVC</Label>
-                      <Input 
-                        id="cvc" 
-                        value={cvc} 
-                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, ''))}
-                        placeholder="123"
-                        maxLength={3}
-                        type="password"
-                      />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="expiry" className="flex items-center">
+                          Expiry date
+                          <Calendar className="ml-2 h-4 w-4 text-gray-400" />
+                        </Label>
+                        <Input 
+                          id="expiry" 
+                          value={expiry} 
+                          onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                          placeholder="MM/YY"
+                          maxLength={5}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cvc">CVC</Label>
+                        <Input 
+                          id="cvc" 
+                          value={cvc} 
+                          onChange={(e) => setCvc(e.target.value.replace(/\D/g, ''))}
+                          placeholder="123"
+                          maxLength={3}
+                          type="password"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                {paymentStatus === "error" && (
-                  <div className="bg-red-50 p-4 rounded-md flex items-center space-x-2 text-red-800">
-                    <XCircle size={20} />
-                    <span>{errorMessage}</span>
-                  </div>
-                )}
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={processing}
-                >
-                  {processing ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    `Pay ₹${getCartTotal()}`
+                  
+                  {paymentStatus === "error" && (
+                    <div className="bg-red-50 p-4 rounded-md flex items-center space-x-2 text-red-800">
+                      <XCircle size={20} />
+                      <span>{errorMessage}</span>
+                    </div>
                   )}
-                </Button>
-                
-                {paymentStatus === "success" && (
-                  <div className="bg-green-50 p-4 rounded-md flex items-center space-x-2 text-green-800">
-                    <CheckCircle size={20} />
-                    <span>Payment successful! Redirecting...</span>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={processing}
+                  >
+                    {processing ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      `Pay ₹${getCartTotal() + 49 + Math.round(getCartTotal() * 0.18)}`
+                    )}
+                  </Button>
+                  
+                  <div className="text-sm text-gray-500 text-center pt-4">
+                    <div className="flex items-center justify-center mb-2">
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      <p>Secure payment processing</p>
+                    </div>
+                    <p>This is a demo. No real payments will be processed.</p>
+                    <p className="mt-1">Use any card number, future expiry date, and any 3 digits for CVC.</p>
                   </div>
-                )}
-                
-                <div className="text-sm text-gray-500 text-center pt-4">
-                  <div className="flex items-center justify-center mb-2">
-                    <ShieldCheck className="mr-2 h-4 w-4" />
-                    <p>Secure payment processing</p>
-                  </div>
-                  <p>This is a demo. No real payments will be processed.</p>
-                  <p className="mt-1">Use any card number, future expiry date, and any 3 digits for CVC.</p>
-                </div>
-              </form>
+                </form>
+              )}
             </CardContent>
           </Card>
         </div>

@@ -19,8 +19,9 @@ const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(listing.image);
   
-  // Extract additional images from the listing if available
+  // Extract additional images from the listing
   const additionalImages = listing.additionalImages || [];
+  // Combine primary image with additional images
   const allImages = [listing.image, ...additionalImages].filter(Boolean);
   
   const handleAddToCart = () => {

@@ -26,15 +26,21 @@ const ItemDetail = () => {
         try {
           const data = await fetchListingById(id);
           if (data) {
+            // Convert image_urls to additionalImages property for consistency
+            const resultListing: ListingProps = {
+              ...data,
+              additionalImages: []
+            };
+            
             // Process additional images if available
             if (data.image_urls && Array.isArray(data.image_urls) && data.image_urls.length > 0) {
-              data.additionalImages = data.image_urls.slice(1).map(url => {
+              resultListing.additionalImages = data.image_urls.slice(1).map(url => {
                 return url.startsWith('http') ? url : `https://aklactzqyglyzkvwugjm.supabase.co/storage/v1/object/public/listings/${url}`;
               });
             }
             
-            setListing(data);
-            console.log("Fetched listing:", data);
+            setListing(resultListing);
+            console.log("Fetched listing:", resultListing);
           } else {
             toast({
               title: "Item not found",
