@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export interface UserProfile {
@@ -47,6 +46,47 @@ export const updateUserProfile = async (updates: Partial<UserProfile>): Promise<
     console.error("Error updating user profile:", error);
     throw error;
   }
+};
+
+// Create user profile if it doesn't exist
+export const ensureUserProfile = async (): Promise<string | null> => {
+  const user = await supabase.auth.getUser();
+  if (!user.data.user) {
+    return null;
+  }
+
+  // Check if profile exists
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', user.data.user.id)
+    .single();
+
+  // If profile exists, return the ID
+  if (existingProfile) {
+    return existingProfile.id;
+  }
+
+  // Otherwise, create a new profile
+  const { data: userData } = user;
+  const defaultName = userData.user.email?.split('@')[0] || 'User';
+  
+  const { data: newProfile, error } = await supabase
+    .from('profiles')
+    .insert({
+      id: userData.user.id,
+      full_name: defaultName,
+      avatar_url: null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating user profile:", error);
+    return null;
+  }
+
+  return newProfile.id;
 };
 
 // Upload user avatar
