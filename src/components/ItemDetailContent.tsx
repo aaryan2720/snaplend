@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Star, Heart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
-import ImageGallery from "./ImageGallery";
+import ImageGallery from "@/components/ImageGallery";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -26,7 +26,8 @@ const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
   };
 
   const { user } = useAuth();
-  const isOwner = listing.owner_id === user?.id;
+  // Since owner_id doesn't exist on ListingProps, check owner.id instead
+  const isOwner = user?.id && listing.owner && user.id === listing.owner.id;
 
   return (
     <div>

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
@@ -8,6 +9,16 @@ import confetti from "canvas-confetti";
 import { CheckCircle, Download, Printer, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+
+// Define the receipt data type
+interface ReceiptData {
+  itemName: string;
+  duration: string;
+  amount: number;
+  paymentId: string;
+  date: string;
+}
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -18,6 +29,15 @@ const PaymentSuccess = () => {
   const [progressValue, setProgressValue] = useState(0);
   
   const { bookingIds, totalAmount, paymentIntentId = null, paymentStatus = "succeeded" } = location.state || {};
+
+  // Create receipt data from available information
+  const receiptData: ReceiptData = {
+    itemName: "Rental Item(s)",
+    duration: "As per booking details",
+    amount: totalAmount || 0,
+    paymentId: paymentIntentId?.substring(0, 8) || "TXN12345678",
+    date: format(new Date(), "dd MMM yyyy")
+  };
   
   useEffect(() => {
     // If no bookingIds are passed, navigate back to home
@@ -47,7 +67,7 @@ const PaymentSuccess = () => {
       const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
 
-      const randomInRange = (min, max) => Math.random() * (max - min) + min;
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
       const confettiAnimation = () => {
         confetti({
@@ -146,7 +166,7 @@ const PaymentSuccess = () => {
                   <h3 className="font-medium mb-2 text-snaplend-800">Booking Details</h3>
                   <div className="text-sm text-gray-600 space-y-1">
                     <p>
-                      Booking ID{bookingIds.length > 1 ? 's' : ''}: {bookingIds.join(', ')}
+                      Booking ID{bookingIds?.length > 1 ? 's' : ''}: {bookingIds?.join(', ')}
                     </p>
                     <p>
                       Amount: ₹{totalAmount}
