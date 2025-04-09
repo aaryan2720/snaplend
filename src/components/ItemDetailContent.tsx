@@ -26,8 +26,8 @@ const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
   };
 
   const { user } = useAuth();
-  // Since owner_id doesn't exist on ListingProps, check owner.id instead
-  const isOwner = user?.id && listing.owner && user.id === listing.owner.id;
+  // Safely check if the user is the owner by checking for both IDs
+  const isOwner = user?.id && listing.owner?.id && user.id === listing.owner.id;
 
   return (
     <div>

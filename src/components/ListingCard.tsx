@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Star, Heart, MapPin, Calendar, User, ExternalLink, Plus, ChevronRight } from "lucide-react";
@@ -10,6 +11,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { Avatar } from "@/components/ui/avatar";
 
 export interface Owner {
+  id?: string; // Added id property
   name: string;
   avatar: string;
   rating: number;
