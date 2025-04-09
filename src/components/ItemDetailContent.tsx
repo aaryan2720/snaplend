@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ListingProps } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
@@ -13,11 +14,11 @@ interface ItemDetailContentProps {
 }
 
 const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
   const { toast } = useToast();
 
   const handleAddToCart = () => {
-    addItem(listing);
+    addToCart(listing);
     toast({
       title: "Added to cart",
       description: "Item added to your cart successfully.",
@@ -30,7 +31,7 @@ const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
   return (
     <div>
       <div className="mb-8">
-        <ImageGallery images={listing.additionalImages} mainImage={listing.image} />
+        <ImageGallery images={listing.additionalImages || []} mainImage={listing.image} />
       </div>
 
       <div className="md:grid md:grid-cols-2 md:gap-8">
