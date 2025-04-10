@@ -113,8 +113,8 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
       return [];
     }
 
-    // Properly type cast the data to handle profiles property
-    return (data as unknown as DbListing[]).map(mapDbListingToFrontend);
+    // Fix: Use explicit type assertion to any before mapping
+    return (data as any[]).map(mapDbListingToFrontend);
   } catch (err) {
     console.error("Exception fetching listings:", err);
     return [];
@@ -143,8 +143,8 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
       return null;
     }
 
-    // Properly type cast the data
-    return mapDbListingToFrontend(data as unknown as DbListing);
+    // Fix: Use explicit type assertion to avoid recursive type issue
+    return mapDbListingToFrontend(data as any);
   } catch (err) {
     console.error(`Exception fetching listing with ID ${id}:`, err);
     return null;
@@ -280,8 +280,8 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
       ];
     }
 
-    // Properly type cast the data
-    return (data as unknown as DbListing[]).map(mapDbListingToFrontend);
+    // Fix: Use explicit type assertion to avoid recursive type issue
+    return (data as any[]).map(mapDbListingToFrontend);
   } catch (err) {
     console.error("Exception fetching user listings:", err);
     return [];
@@ -316,8 +316,8 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       return getDefaultListings();
     }
 
-    // Properly type cast the data
-    return (data as unknown as DbListing[]).map(listing => ({
+    // Fix: Use explicit type assertion to avoid recursive type issues
+    return (data as any[]).map(listing => ({
       ...mapDbListingToFrontend(listing),
       featured: true
     }));

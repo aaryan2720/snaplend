@@ -27,35 +27,8 @@ const ItemDetail = () => {
         try {
           const data = await fetchListingById(id);
           if (data) {
-            // Convert image_urls to additionalImages property for consistency
-            const resultListing: ListingProps = {
-              ...data,
-              additionalImages: []
-            };
-            
-            // Process additional images if available
-            if (data.image_urls && Array.isArray(data.image_urls) && data.image_urls.length > 0) {
-              resultListing.additionalImages = data.image_urls.slice(1).map(url => {
-                return url.startsWith('http') ? url : `https://aklactzqyglyzkvwugjm.supabase.co/storage/v1/object/public/listings/${url}`;
-              });
-            }
-            
-            // Ensure owner has an appropriate avatar based on gender
-            if (resultListing.owner) {
-              if (!resultListing.owner.avatar || resultListing.owner.avatar === "https://i.pravatar.cc/150?img=32") {
-                // Use gender-appropriate avatar if possible
-                const gender = resultListing.owner.gender || 'unspecified';
-                resultListing.owner.avatar = getDefaultAvatar(gender);
-              }
-              
-              // Set default rating to 0 if not provided
-              if (resultListing.owner.rating === undefined || resultListing.owner.rating === null) {
-                resultListing.owner.rating = 0;
-              }
-            }
-            
-            setListing(resultListing);
-            console.log("Fetched listing:", resultListing);
+            setListing(data);
+            console.log("Fetched listing:", data);
           } else {
             toast({
               title: "Item not found",
