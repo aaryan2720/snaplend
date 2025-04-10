@@ -316,8 +316,8 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       return getDefaultListings();
     }
 
-    // Fix: Use explicit type assertion and avoid the nested mapping that caused the deep type issue
-    const mappedListings = (data as any[]).map(item => {
+    // Fix: Use explicit type assertion to avoid deep type instantiation
+    const mappedListings = (data as any[]).map((item: any) => {
       const listing = mapDbListingToFrontend(item);
       listing.featured = true;
       return listing;
