@@ -12,7 +12,6 @@ import { Loader2, Home } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ItemDetailContent from "@/components/ItemDetailContent";
-import { getDefaultAvatar } from "@/services/profileService";
 
 const ItemDetail = () => {
   const { id } = useParams<{ id: string }>();

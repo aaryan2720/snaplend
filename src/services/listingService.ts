@@ -43,7 +43,7 @@ interface DbListing {
 }
 
 // Convert database listing to frontend listing format
-const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
+const mapDbListingToFrontend = (dbListing: any): ListingProps => {
   // Create owner object with default values
   const owner: Owner = {
     id: dbListing.profiles?.id,
@@ -228,7 +228,7 @@ export const markListingAsSold = async (id: string): Promise<boolean> => {
 };
 
 // Fetch listings by owner ID
-export const getUserListings = async (userId: string): Promise<any[]> => {
+export const getUserListings = async (userId: string): Promise<ListingProps[]> => {
   try {
     if (!userId) return [];
 
@@ -277,11 +277,11 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
           category: 'sports',
           is_sold: false
         }
-      ];
+      ] as any[];
     }
 
     // Fix: Use explicit type assertion to avoid recursive type issue
-    return (data as any[]).map(mapDbListingToFrontend);
+    return (data as any[]).map(item => mapDbListingToFrontend(item));
   } catch (err) {
     console.error("Exception fetching user listings:", err);
     return [];
@@ -316,11 +316,14 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       return getDefaultListings();
     }
 
-    // Fix: Use explicit type assertion to avoid recursive type issues
-    return (data as any[]).map(listing => ({
-      ...mapDbListingToFrontend(listing),
-      featured: true
-    }));
+    // Fix: Use explicit type assertion and avoid the nested mapping that caused the deep type issue
+    const mappedListings = (data as any[]).map(item => {
+      const listing = mapDbListingToFrontend(item);
+      listing.featured = true;
+      return listing;
+    });
+    
+    return mappedListings;
   } catch (err) {
     console.error("Exception fetching featured listings:", err);
     return getDefaultListings();
