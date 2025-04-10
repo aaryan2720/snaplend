@@ -1,3 +1,4 @@
+
 import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
 import { getDefaultAvatar } from "@/services/profileService";
@@ -38,16 +39,17 @@ interface DbListing {
     full_name: string | null;
     avatar_url: string | null;
     gender?: string;
-  };
+  } | null;
 }
 
 // Convert database listing to frontend listing format
 const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
+  // Create owner object with default values
   const owner: Owner = {
     id: dbListing.profiles?.id,
     name: dbListing.profiles?.full_name || "Anonymous User",
     avatar: dbListing.profiles?.avatar_url || getDefaultAvatar(dbListing.profiles?.gender),
-    rating: 0,
+    rating: 0, // Default rating is always 0
     gender: dbListing.profiles?.gender
   };
 
@@ -77,7 +79,7 @@ const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
     priceUnit: "day" as "hour" | "day" | "week" | "month", // Ensure type is correct
     location: dbListing.location,
     distance: "Near you", // This would need to be calculated based on user's location
-    rating: 0, // Default value for rating
+    rating: 0, // Default value for rating is always 0
     reviewCount: 0, // Default value, should be counted from reviews
     image: imageUrl,
     image_urls: dbListing.image_urls,
@@ -111,7 +113,8 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
       return [];
     }
 
-    return (data as DbListing[]).map(mapDbListingToFrontend);
+    // Properly type cast the data to handle profiles property
+    return (data as unknown as DbListing[]).map(mapDbListingToFrontend);
   } catch (err) {
     console.error("Exception fetching listings:", err);
     return [];
@@ -140,8 +143,8 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
       return null;
     }
 
-    const dbListing = data as unknown as DbListing;
-    return mapDbListingToFrontend(dbListing);
+    // Properly type cast the data
+    return mapDbListingToFrontend(data as unknown as DbListing);
   } catch (err) {
     console.error(`Exception fetching listing with ID ${id}:`, err);
     return null;
@@ -277,7 +280,8 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
       ];
     }
 
-    return (data as DbListing[]).map(mapDbListingToFrontend);
+    // Properly type cast the data
+    return (data as unknown as DbListing[]).map(mapDbListingToFrontend);
   } catch (err) {
     console.error("Exception fetching user listings:", err);
     return [];
@@ -312,7 +316,8 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       return getDefaultListings();
     }
 
-    return (data as DbListing[]).map(listing => ({
+    // Properly type cast the data
+    return (data as unknown as DbListing[]).map(listing => ({
       ...mapDbListingToFrontend(listing),
       featured: true
     }));

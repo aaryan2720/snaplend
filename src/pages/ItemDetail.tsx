@@ -40,11 +40,11 @@ const ItemDetail = () => {
               });
             }
             
-            // Ensure owner has an appropriate avatar based on profile
+            // Ensure owner has an appropriate avatar based on gender
             if (resultListing.owner) {
               if (!resultListing.owner.avatar || resultListing.owner.avatar === "https://i.pravatar.cc/150?img=32") {
                 // Use gender-appropriate avatar if possible
-                const gender = data.owner?.gender || 'unspecified';
+                const gender = resultListing.owner.gender || 'unspecified';
                 resultListing.owner.avatar = getDefaultAvatar(gender);
               }
               

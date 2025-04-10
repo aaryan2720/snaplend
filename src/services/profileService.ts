@@ -74,18 +74,18 @@ export const ensureUserProfile = async (): Promise<string | null> => {
   const defaultName = userData.user.email?.split('@')[0] || 'User';
   const gender = userData.user.user_metadata?.gender || 'unspecified';
   
-  // Generate a unique avatar for this user based on their email
+  // Generate a unique avatar for this user
+  // Use the email to generate a unique seed for the avatar
   const emailHash = userData.user.email ? 
     userData.user.email.split('@')[0].charAt(0).toLowerCase() : 'a';
-  const uniqueAvatarId = emailHash.charCodeAt(0) % 100;
-  const defaultAvatar = getDefaultAvatar(gender, uniqueAvatarId);
+  const uniqueAvatar = getUniqueDefaultAvatar(userData.user.id, gender);
   
   const { data: newProfile, error } = await supabase
     .from('profiles')
     .insert({
       id: userData.user.id,
       full_name: userData.user.user_metadata?.full_name || defaultName,
-      avatar_url: defaultAvatar,
+      avatar_url: uniqueAvatar,
       gender: gender
     })
     .select()
@@ -97,6 +97,22 @@ export const ensureUserProfile = async (): Promise<string | null> => {
   }
 
   return newProfile.id;
+};
+
+// Get a truly unique default avatar based on user ID and gender
+export const getUniqueDefaultAvatar = (userId: string, gender?: string): string => {
+  // Create a numerical hash from the user ID to get a unique avatar for each user
+  let hash = 0;
+  for (let i = 0; i < userId.length; i++) {
+    const char = userId.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  
+  // Get a positive value between 0-99
+  const uniqueId = Math.abs(hash) % 100;
+  
+  return getDefaultAvatar(gender, uniqueId);
 };
 
 // Get appropriate default avatar based on gender and a unique identifier

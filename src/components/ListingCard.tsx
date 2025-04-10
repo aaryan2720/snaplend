@@ -1,13 +1,11 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Star, Heart, MapPin, Calendar, User, ExternalLink, Plus, ChevronRight, Home, Trash2 } from "lucide-react";
+import { ShoppingCart, Star, Heart, MapPin, Calendar, User, ExternalLink, Plus, ChevronRight, Home, Trash2, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import { Tooltip } from "@/components/ui/tooltip";
 import { Avatar } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteListing } from "@/services/listingService";
