@@ -114,7 +114,7 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
     }
 
     // Fix: Use explicit type assertion to any before mapping
-    return (data as any[]).map(mapDbListingToFrontend);
+    return (data as any[]).map((item: any) => mapDbListingToFrontend(item));
   } catch (err) {
     console.error("Exception fetching listings:", err);
     return [];
@@ -280,8 +280,9 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
       ] as any[];
     }
 
-    // Fix: Use explicit type assertion to any to prevent recursive type issue
-    return (data as any[]).map(item => mapDbListingToFrontend(item as any));
+    // Complete fix: Add type assertions for both the array and each item
+    // This breaks the deep type reference chain that was causing the error
+    return (data as any[]).map((item: any) => mapDbListingToFrontend(item));
   } catch (err) {
     console.error("Exception fetching user listings:", err);
     return [];
@@ -316,7 +317,7 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       return getDefaultListings();
     }
 
-    // Fix: Explicitly type both the array and the item to avoid deep type instantiation
+    // Complete fix: Explicitly break the recursive type chain with type assertions
     const mappedListings = (data as any[]).map((item: any) => {
       const listing = mapDbListingToFrontend(item);
       listing.featured = true;
