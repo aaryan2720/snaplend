@@ -113,8 +113,8 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
       return [];
     }
 
-    // Fix: Use explicit type assertion to any before mapping
-    return (data as any[]).map((item: any) => mapDbListingToFrontend(item));
+    // Use explicit type assertion to any[] and map each item as any
+    return (data || []).map((item) => mapDbListingToFrontend(item as any)) as ListingProps[];
   } catch (err) {
     console.error("Exception fetching listings:", err);
     return [];
@@ -143,7 +143,7 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
       return null;
     }
 
-    // Fix: Use explicit type assertion to avoid recursive type issue
+    // Use explicit type assertion to break recursive type chain
     return mapDbListingToFrontend(data as any);
   } catch (err) {
     console.error(`Exception fetching listing with ID ${id}:`, err);
@@ -252,7 +252,7 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
 
     if (!data || data.length === 0) {
       // Return mock data for now if no real data exists
-      return [
+      const mockData = [
         {
           id: 'l1',
           title: 'Professional DSLR Camera Kit',
@@ -277,12 +277,13 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
           category: 'sports',
           is_sold: false
         }
-      ] as any[];
+      ];
+      
+      return mockData.map(item => mapDbListingToFrontend(item as any));
     }
 
-    // Complete fix: Add type assertions for both the array and each item
-    // This breaks the deep type reference chain that was causing the error
-    return (data as any[]).map((item: any) => mapDbListingToFrontend(item));
+    // Use type assertions to avoid deep type instantiation errors
+    return data.map(item => mapDbListingToFrontend(item as any));
   } catch (err) {
     console.error("Exception fetching user listings:", err);
     return [];
@@ -317,9 +318,10 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       return getDefaultListings();
     }
 
-    // Complete fix: Explicitly break the recursive type chain with type assertions
-    const mappedListings = (data as any[]).map((item: any) => {
-      const listing = mapDbListingToFrontend(item);
+    // Use explicit type assertions to break the recursive type chain
+    const mappedListings = data.map((item) => {
+      // Type assertion to break the chain
+      const listing = mapDbListingToFrontend(item as any);
       listing.featured = true;
       return listing;
     });
