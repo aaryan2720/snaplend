@@ -113,8 +113,8 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
       return [];
     }
 
-    // Use explicit type assertion to any[] and map each item as any
-    return (data || []).map((item) => mapDbListingToFrontend(item as any)) as ListingProps[];
+    // Important fix: Cast to any and break the type chain before mapping
+    return (data || []).map((item: any) => mapDbListingToFrontend(item)) as ListingProps[];
   } catch (err) {
     console.error("Exception fetching listings:", err);
     return [];
@@ -143,7 +143,7 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
       return null;
     }
 
-    // Use explicit type assertion to break recursive type chain
+    // Important fix: Use explicit any type to break the recursive type chain
     return mapDbListingToFrontend(data as any);
   } catch (err) {
     console.error(`Exception fetching listing with ID ${id}:`, err);
@@ -279,10 +279,11 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
         }
       ];
       
+      // Important fix: Cast mock data item to any and make sure TypeScript doesn't track type relationship chains
       return mockData.map(item => mapDbListingToFrontend(item as any));
     }
 
-    // Use type assertions to avoid deep type instantiation errors
+    // Important fix: Break the type chain by explicitly casting each item to any
     return data.map(item => mapDbListingToFrontend(item as any));
   } catch (err) {
     console.error("Exception fetching user listings:", err);
@@ -318,13 +319,17 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       return getDefaultListings();
     }
 
-    // Use explicit type assertions to break the recursive type chain
-    const mappedListings = data.map((item) => {
-      // Type assertion to break the chain
-      const listing = mapDbListingToFrontend(item as any);
+    // Critical fix: Break the type chain with explicit any cast 
+    // and handle each item individually to prevent excessive type instantiation
+    const mappedListings: ListingProps[] = [];
+    
+    for (const item of data) {
+      // Use any type to break the deep type instantiation chain
+      const itemAny: any = item;
+      const listing = mapDbListingToFrontend(itemAny);
       listing.featured = true;
-      return listing;
-    });
+      mappedListings.push(listing);
+    }
     
     return mappedListings;
   } catch (err) {
