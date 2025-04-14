@@ -77,6 +77,7 @@ export type Database = {
           id: string
           image_urls: string[] | null
           is_active: boolean | null
+          is_sold: boolean | null
           location: string
           owner_id: string
           price: number
@@ -93,6 +94,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           is_active?: boolean | null
+          is_sold?: boolean | null
           location: string
           owner_id: string
           price: number
@@ -109,6 +111,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           is_active?: boolean | null
+          is_sold?: boolean | null
           location?: string
           owner_id?: string
           price?: number
@@ -209,7 +212,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_featured_listings: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          title: string
+          description: string
+          price: number
+          location: string
+          category: string
+          owner_id: string
+          image_urls: string[]
+          created_at: string
+          updated_at: string
+          is_active: boolean
+          is_sold: boolean
+          availability_start: string
+          availability_end: string
+          deposit: number
+          profile_id: string
+          profile_name: string
+          profile_avatar: string
+          profile_gender: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
