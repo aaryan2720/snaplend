@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -93,18 +93,18 @@ const CreateListing = () => {
     for (const image of images) {
       if (image.file) {
         const fileExt = image.file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2, 15)}-${Date.now()}.${fileExt}`;
+        const fileName = `listing-${Date.now()}.${fileExt}`;
         const filePath = `${user?.id}/${fileName}`;
         
-        const { data, error } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('listings')
           .upload(filePath, image.file);
           
-        if (error) {
-          console.error('Error uploading image:', error);
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
           toast({
             title: "Upload failed",
-            description: error.message,
+            description: uploadError.message,
             variant: "destructive",
           });
           continue;

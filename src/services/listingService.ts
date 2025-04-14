@@ -1,4 +1,3 @@
-
 import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
 import { getDefaultAvatar } from "@/services/profileService";
@@ -53,22 +52,24 @@ const mapDbListingToFrontend = (dbListing: any): ListingProps => {
     gender: dbListing.profiles?.gender
   };
 
-  // Process image URLs - check if they're full URLs or storage paths
+  // Process image URLs with more robust handling
   let imageUrl = "https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800";
   
   if (dbListing.image_urls && dbListing.image_urls.length > 0) {
     const firstImage = dbListing.image_urls[0];
-    if (firstImage.startsWith('http')) {
-      imageUrl = firstImage;
-    } else {
-      // Use the storage URL helper function for non-absolute URLs
+    // If it's a full URL or starts with a Supabase storage path
+    if (firstImage.startsWith('http') || firstImage.startsWith('listings/')) {
       imageUrl = getStorageUrl('listings', firstImage);
     }
   }
 
-  // Process additional images if available
+  // Process additional images with similar logic
   const additionalImages = dbListing.image_urls && dbListing.image_urls.length > 1 
-    ? dbListing.image_urls.slice(1).map(url => url.startsWith('http') ? url : getStorageUrl('listings', url))
+    ? dbListing.image_urls.slice(1).map(url => 
+        url.startsWith('http') || url.startsWith('listings/') 
+          ? getStorageUrl('listings', url) 
+          : url
+      )
     : [];
 
   return {
@@ -326,80 +327,7 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
 
 // Provide default listings when needed
 export const getDefaultListings = (): ListingProps[] => {
-  return [
-    {
-      id: 'default-1',
-      title: 'Professional DSLR Camera Kit',
-      description: 'Canon EOS 5D Mark IV with lenses and accessories',
-      price: 1200,
-      priceUnit: "day",
-      location: 'Indiranagar, Bangalore',
-      distance: '2.5 km',
-      rating: 0,
-      reviewCount: 0,
-      image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Rahul M.',
-        avatar: 'https://i.pravatar.cc/150?img=68',
-        rating: 0
-      },
-      featured: true
-    },
-    {
-      id: 'default-2',
-      title: 'Mountain Bike - Trek X-Caliber 8',
-      description: 'Perfect for trails and off-road adventures',
-      price: 450,
-      priceUnit: "day",
-      location: 'Koramangala, Bangalore',
-      distance: '3.8 km',
-      rating: 0,
-      reviewCount: 0,
-      image: 'https://images.unsplash.com/photo-1545714968-62a0bf2c033d?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Priya S.',
-        avatar: 'https://i.pravatar.cc/150?img=47',
-        rating: 0
-      },
-      featured: true
-    },
-    {
-      id: 'default-3',
-      title: 'Drone - DJI Mini 2',
-      description: 'Lightweight drone perfect for aerial photography',
-      price: 650,
-      priceUnit: "day",
-      location: 'HSR Layout, Bangalore',
-      distance: '5.2 km',
-      rating: 0,
-      reviewCount: 0,
-      image: 'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Vikram S.',
-        avatar: 'https://i.pravatar.cc/150?img=67',
-        rating: 0
-      },
-      featured: true
-    },
-    {
-      id: 'default-4',
-      title: 'Projector - Epson Home Cinema',
-      description: 'Full HD projector for home theater setup',
-      price: 500,
-      priceUnit: "day",
-      location: 'Whitefield, Bangalore',
-      distance: '7.5 km',
-      rating: 0,
-      reviewCount: 0,
-      image: 'https://images.unsplash.com/photo-1588416499018-d8c952dc4554?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Arjun P.',
-        avatar: 'https://i.pravatar.cc/150?img=59',
-        rating: 0
-      },
-      featured: true
-    }
-  ];
+  return [];
 };
 
 // Get user's favorites
