@@ -4,21 +4,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import { ReceiptTemplate } from "@/components/receipt/ReceiptTemplate";
 import { confirmStripePayment } from "@/services/stripePaymentService";
 import confetti from "canvas-confetti";
-import { CheckCircle, Download, Printer, Share2 } from "lucide-react";
+import { CheckCircle, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { format } from "date-fns";
-
-// Define the receipt data type
-interface ReceiptData {
-  itemName: string;
-  duration: string;
-  amount: number;
-  paymentId: string;
-  date: string;
-}
 
 const PaymentSuccess = () => {
   const location = useLocation();
@@ -29,15 +20,6 @@ const PaymentSuccess = () => {
   const [progressValue, setProgressValue] = useState(0);
   
   const { bookingIds, totalAmount, paymentIntentId = null, paymentStatus = "succeeded" } = location.state || {};
-
-  // Create receipt data from available information
-  const receiptData: ReceiptData = {
-    itemName: "Rental Item(s)",
-    duration: "As per booking details",
-    amount: totalAmount || 0,
-    paymentId: paymentIntentId?.substring(0, 8) || "TXN12345678",
-    date: format(new Date(), "dd MMM yyyy")
-  };
   
   useEffect(() => {
     // If no bookingIds are passed, navigate back to home
@@ -202,70 +184,16 @@ const PaymentSuccess = () => {
                   </Button>
                 </div>
                 
-                <div className="mt-6">
-                  <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
-                    <h3 className="text-lg font-medium mb-4">Receipt</h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Item:</span>
-                        <span className="font-medium">{receiptData?.itemName}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Duration:</span>
-                        <span className="font-medium">{receiptData?.duration}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Amount:</span>
-                        <span className="font-medium">₹{receiptData?.amount}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Payment ID:</span>
-                        <span className="font-medium">{receiptData?.paymentId}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Date:</span>
-                        <span className="font-medium">{receiptData?.date}</span>
-                      </div>
-                    </div>
+                {animationComplete && (
+                  <div className="mt-6">
+                    <h3 className="font-medium mb-4 text-gray-800">Receipt</h3>
+                    <ReceiptTemplate 
+                      bookingIds={bookingIds || []}
+                      totalAmount={totalAmount || 0}
+                      paymentIntentId={paymentIntentId || "TXN12345678"}
+                    />
                   </div>
-                </div>
-                
-                <div className="flex items-center justify-center space-x-3 pt-6">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-gray-600"
-                    disabled={!animationComplete}
-                    onClick={() => {
-                      const printWindow = window.open("", "_blank");
-                      if (printWindow) {
-                        printWindow.document.write(document.querySelector(".receipt-template")?.innerHTML || "");
-                        printWindow.document.close();
-                        printWindow.print();
-                      }
-                    }}
-                  >
-                    <Printer className="mr-1 h-4 w-4" />
-                    Print Receipt
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600"
-                    disabled={!animationComplete}
-                    onClick={() => {
-                      // In a real app, this would open a share dialog
-                      toast({
-                        title: "Share options",
-                        description: "Share dialog would open here.",
-                      });
-                    }}
-                  >
-                    <Share2 className="mr-1 h-4 w-4" />
-                    Share
-                  </Button>
-                </div>
+                )}
                 
                 <div className="grid grid-cols-2 gap-4 pt-2">
                   <Button 

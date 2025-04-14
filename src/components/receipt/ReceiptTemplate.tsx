@@ -1,9 +1,11 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
-import { Printer, Share2 } from "lucide-react";
+import { Download, Printer, Share2 } from "lucide-react";
 import React, { useState } from "react";
+import { downloadReceipt } from "@/services/receiptService";
 
 interface ReceiptTemplateProps {
   bookingIds: string[];
@@ -21,20 +23,44 @@ export const ReceiptTemplate: React.FC<ReceiptTemplateProps> = ({
   customerName = "Valued Customer",
 }) => {
   const { toast } = useToast();
-const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-const handlePrint = () => {
-  window.print();
-};
+  const handlePrint = () => {
+    window.print();
+  };
 
-const handleShare = () => {
-  toast({
-    title: "Share options",
-    description: "Share dialog would open here.",
-  });
-};
+  const handleShare = () => {
+    toast({
+      title: "Share options",
+      description: "Share dialog would open here.",
+    });
+  };
+  
+  const handleDownload = () => {
+    try {
+      downloadReceipt({
+        bookingIds,
+        totalAmount,
+        paymentIntentId,
+        paymentDate,
+        customerName
+      });
+      
+      toast({
+        title: "Receipt downloaded",
+        description: "Your receipt has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Error downloading receipt:", error);
+      toast({
+        title: "Download failed",
+        description: "There was an error downloading your receipt. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
-return (
+  return (
     <Card 
       className={`w-full max-w-2xl mx-auto bg-white shadow-lg p-8 cursor-pointer transition-all duration-300 ${expanded ? 'scale-105' : 'hover:scale-102'}`}
       onClick={() => setExpanded(!expanded)}
@@ -101,6 +127,19 @@ return (
           >
             <Printer className="mr-2 h-4 w-4" />
             Print Receipt
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-gray-600"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDownload();
+            }}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download PDF
           </Button>
           
           <Button
