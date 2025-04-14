@@ -291,10 +291,11 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
   }
 };
 
-// Fetch featured listings
+// Fetch featured listings - Completely rewritten with more aggressive type handling
 export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
   try {
-    const { data, error } = await supabase
+    // Use type assertion to break the connection right at the database query
+    const result: any = await supabase
       .from('listings')
       .select(`
         *,
@@ -309,24 +310,24 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
       .eq('is_sold', false)
       .order('created_at', { ascending: false })
       .limit(4);
-
-    if (error) {
-      console.error("Error fetching featured listings:", error);
+    
+    // Handle database error or empty result
+    if (result.error || !result.data || result.data.length === 0) {
+      console.error("Error or empty result fetching featured listings:", result.error);
       return getDefaultListings();
     }
-
-    if (!data || data.length === 0) {
-      return getDefaultListings();
-    }
-
-    // Critical fix: Break the type chain with explicit any cast 
-    // and handle each item individually to prevent excessive type instantiation
+    
+    // Convert the raw data to listing objects, breaking any type chain completely
     const mappedListings: ListingProps[] = [];
     
-    for (const item of data) {
-      // Use any type to break the deep type instantiation chain
-      const itemAny: any = item;
-      const listing = mapDbListingToFrontend(itemAny);
+    // Process each item separately to avoid TypeScript tracking relationships
+    for (let i = 0; i < result.data.length; i++) {
+      const rawItem = result.data[i];
+      // Process as a completely new object with no type relationship to the original
+      const listing = mapDbListingToFrontend({
+        ...rawItem,
+        profiles: rawItem.profiles ? { ...rawItem.profiles } : null
+      });
       listing.featured = true;
       mappedListings.push(listing);
     }
