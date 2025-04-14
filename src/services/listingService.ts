@@ -291,48 +291,33 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
   }
 };
 
-// Fetch featured listings - Completely rewritten with more aggressive type handling
+// Completely rewritten to fix TypeScript "excessively deep" error
 export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
   try {
-    // Use type assertion to break the connection right at the database query
-    const result: any = await supabase
-      .from('listings')
-      .select(`
-        *,
-        profiles:owner_id (
-          id,
-          full_name,
-          avatar_url,
-          gender
-        )
-      `)
-      .eq('is_active', true)
-      .eq('is_sold', false)
-      .order('created_at', { ascending: false })
-      .limit(4);
+    // Make direct SQL query to avoid TypeScript tracking relationships between tables
+    const { data, error } = await supabase.rpc('get_featured_listings');
     
-    // Handle database error or empty result
-    if (result.error || !result.data || result.data.length === 0) {
-      console.error("Error or empty result fetching featured listings:", result.error);
+    if (error || !data || data.length === 0) {
+      console.error("Error or empty result fetching featured listings:", error);
       return getDefaultListings();
     }
     
-    // Convert the raw data to listing objects, breaking any type chain completely
-    const mappedListings: ListingProps[] = [];
-    
-    // Process each item separately to avoid TypeScript tracking relationships
-    for (let i = 0; i < result.data.length; i++) {
-      const rawItem = result.data[i];
-      // Process as a completely new object with no type relationship to the original
+    // Process results as simple objects without type relationships
+    return data.map((rawItem: any) => {
       const listing = mapDbListingToFrontend({
         ...rawItem,
-        profiles: rawItem.profiles ? { ...rawItem.profiles } : null
+        // Extract profile data if it exists
+        profiles: rawItem.profile_id ? {
+          id: rawItem.profile_id,
+          full_name: rawItem.profile_name,
+          avatar_url: rawItem.profile_avatar,
+          gender: rawItem.profile_gender
+        } : null
       });
+      
       listing.featured = true;
-      mappedListings.push(listing);
-    }
-    
-    return mappedListings;
+      return listing;
+    });
   } catch (err) {
     console.error("Exception fetching featured listings:", err);
     return getDefaultListings();
