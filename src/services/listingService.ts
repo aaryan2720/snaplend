@@ -1,6 +1,7 @@
 
 import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
+import { getDefaultAvatar } from "@/services/profileService";
 
 // Type for creating a new listing
 export interface CreateListingPayload {
@@ -30,49 +31,64 @@ interface DbListing {
   availability_start?: string;
   availability_end?: string;
   is_active?: boolean;
+  is_sold?: boolean;
   created_at: string;
   updated_at: string;
   profiles?: {
     id: string;
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 // Convert database listing to frontend listing format
-const mapDbListingToFrontend = (dbListing: DbListing): ListingProps => {
+const mapDbListingToFrontend = (dbListing: any): ListingProps => {
+  // Create owner object with default values
   const owner: Owner = {
+    id: dbListing.profiles?.id,
     name: dbListing.profiles?.full_name || "Anonymous User",
-    avatar: dbListing.profiles?.avatar_url || "https://i.pravatar.cc/150?img=32", // Default avatar
-    rating: 4.5 // Default rating for now, can be calculated from reviews later
+    avatar: dbListing.profiles?.avatar_url || getDefaultAvatar(),
+    rating: 0, // Default rating is always 0
   };
 
-  // Process image URLs - check if they're full URLs or storage paths
-  let imageUrl = "https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800";
+  // Process image URLs with more robust handling
+  let imageUrl = "/placeholder.svg";
   
   if (dbListing.image_urls && dbListing.image_urls.length > 0) {
     const firstImage = dbListing.image_urls[0];
-    if (firstImage.startsWith('http')) {
-      imageUrl = firstImage;
-    } else {
-      // Use the storage URL helper function for non-absolute URLs
+    // If it's a full URL or starts with a Supabase storage path
+    if (firstImage.startsWith('http') || firstImage.startsWith('listings/')) {
       imageUrl = getStorageUrl('listings', firstImage);
     }
   }
+
+  // Process additional images with similar logic
+  const additionalImages = dbListing.image_urls && dbListing.image_urls.length > 1 
+    ? dbListing.image_urls.slice(1).map(url => 
+        url.startsWith('http') || url.startsWith('listings/') 
+          ? getStorageUrl('listings', url) 
+          : url
+      )
+    : [];
 
   return {
     id: dbListing.id,
     title: dbListing.title,
     description: dbListing.description,
     price: dbListing.price,
-    priceUnit: "day" as "hour" | "day" | "week" | "month", // Ensure type is correct
+    priceUnit: dbListing.priceUnit || "day", // Default to "day" if not specified
     location: dbListing.location,
     distance: "Near you", // This would need to be calculated based on user's location
-    rating: 4.5, // Default value, should be calculated from reviews
+    rating: 0, // Default value for rating is always 0
     reviewCount: 0, // Default value, should be counted from reviews
     image: imageUrl,
+    image_urls: dbListing.image_urls,
+    additionalImages,
     owner,
-    featured: false // Default value, can be set based on some criteria later
+    featured: false, // Default value, can be set based on some criteria later
+    category: dbListing.category,
+    isSold: dbListing.is_sold || false,
+    owner_id: dbListing.owner_id
   };
 };
 
@@ -96,7 +112,12 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
       return [];
     }
 
-    return (data as DbListing[]).map(mapDbListingToFrontend);
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    // Important fix: Cast to any and break the type chain before mapping
+    return data.map((item: any) => mapDbListingToFrontend(item));
   } catch (err) {
     console.error("Exception fetching listings:", err);
     return [];
@@ -124,7 +145,12 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
       return null;
     }
 
-    return mapDbListingToFrontend(data as DbListing);
+    if (!data) {
+      return null;
+    }
+
+    // Important fix: Use explicit any type to break the recursive type chain
+    return mapDbListingToFrontend(data as any);
   } catch (err) {
     console.error(`Exception fetching listing with ID ${id}:`, err);
     return null;
@@ -144,7 +170,8 @@ export const createListing = async (listing: CreateListingPayload): Promise<stri
       .insert({
         ...listing,
         owner_id: userData.user.id,
-        is_active: true
+        is_active: true,
+        is_sold: false
       })
       .select()
       .single();
@@ -162,7 +189,7 @@ export const createListing = async (listing: CreateListingPayload): Promise<stri
 };
 
 // Update a listing
-export const updateListing = async (id: string, updates: Partial<CreateListingPayload>): Promise<boolean> => {
+export const updateListing = async (id: string, updates: Partial<CreateListingPayload & { is_sold?: boolean }>): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('listings')
@@ -181,12 +208,12 @@ export const updateListing = async (id: string, updates: Partial<CreateListingPa
   }
 };
 
-// Delete a listing (or mark as inactive)
+// Delete a listing (actual deletion, not just marking inactive)
 export const deleteListing = async (id: string): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('listings')
-      .update({ is_active: false })
+      .delete()
       .eq('id', id);
 
     if (error) {
@@ -201,8 +228,13 @@ export const deleteListing = async (id: string): Promise<boolean> => {
   }
 };
 
+// Mark a listing as sold
+export const markListingAsSold = async (id: string): Promise<boolean> => {
+  return await updateListing(id, { is_sold: true });
+};
+
 // Fetch listings by owner ID
-export const getUserListings = async (userId: string): Promise<any[]> => {
+export const getUserListings = async (userId: string): Promise<ListingProps[]> => {
   try {
     if (!userId) return [];
 
@@ -224,34 +256,11 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
     }
 
     if (!data || data.length === 0) {
-      // Return mock data for now if no real data exists
-      return [
-        {
-          id: 'l1',
-          title: 'Professional DSLR Camera Kit',
-          description: 'Canon EOS 5D Mark IV with lenses and accessories',
-          price: 1200,
-          priceUnit: 'day',
-          location: 'Indiranagar, Bangalore',
-          image_urls: ['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000&h=800'],
-          created_at: new Date().toISOString(),
-          category: 'electronics'
-        },
-        {
-          id: 'l2',
-          title: 'Mountain Bike - Trek X-Caliber 8',
-          description: 'Perfect for trails and off-road adventures',
-          price: 450,
-          priceUnit: 'day',
-          location: 'Koramangala, Bangalore',
-          image_urls: ['https://images.unsplash.com/photo-1545714968-62a0bf2c033d?auto=format&fit=crop&q=80&w=1000&h=800'],
-          created_at: new Date().toISOString(),
-          category: 'sports'
-        }
-      ];
+      return [];
     }
 
-    return data;
+    // Important fix: Break the type chain by explicitly casting each item to any
+    return data.map(item => mapDbListingToFrontend(item as any));
   } catch (err) {
     console.error("Exception fetching user listings:", err);
     return [];
@@ -261,115 +270,33 @@ export const getUserListings = async (userId: string): Promise<any[]> => {
 // Fetch featured listings
 export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
   try {
-    const { data, error } = await supabase
-      .from('listings')
-      .select(`
-        *,
-        profiles:owner_id (
-          id,
-          full_name,
-          avatar_url
-        )
-      `)
-      .eq('is_active', true)
-      .order('created_at', { ascending: false })
-      .limit(4);
-
-    if (error) {
-      console.error("Error fetching featured listings:", error);
-      return getDefaultListings();
+    // Make direct SQL query to avoid TypeScript tracking relationships between tables
+    const { data, error } = await supabase.rpc('get_featured_listings');
+    
+    if (error || !data || data.length === 0) {
+      console.error("Error or empty result fetching featured listings:", error);
+      return [];
     }
-
-    if (!data || data.length === 0) {
-      return getDefaultListings();
-    }
-
-    return (data as DbListing[]).map(listing => ({
-      ...mapDbListingToFrontend(listing),
-      featured: true
-    }));
+    
+    // Process results as simple objects without type relationships
+    return data.map((rawItem: any) => {
+      const listing = mapDbListingToFrontend({
+        ...rawItem,
+        // Extract profile data if it exists
+        profiles: rawItem.profile_id ? {
+          id: rawItem.profile_id,
+          full_name: rawItem.profile_name,
+          avatar_url: rawItem.profile_avatar
+        } : null
+      });
+      
+      listing.featured = true;
+      return listing;
+    });
   } catch (err) {
     console.error("Exception fetching featured listings:", err);
-    return getDefaultListings();
+    return [];
   }
-};
-
-// Provide default listings when needed
-export const getDefaultListings = (): ListingProps[] => {
-  return [
-    {
-      id: 'default-1',
-      title: 'Professional DSLR Camera Kit',
-      description: 'Canon EOS 5D Mark IV with lenses and accessories',
-      price: 1200,
-      priceUnit: "day",
-      location: 'Indiranagar, Bangalore',
-      distance: '2.5 km',
-      rating: 4.8,
-      reviewCount: 24,
-      image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Rahul M.',
-        avatar: 'https://i.pravatar.cc/150?img=68',
-        rating: 4.9
-      },
-      featured: true
-    },
-    {
-      id: 'default-2',
-      title: 'Mountain Bike - Trek X-Caliber 8',
-      description: 'Perfect for trails and off-road adventures',
-      price: 450,
-      priceUnit: "day",
-      location: 'Koramangala, Bangalore',
-      distance: '3.8 km',
-      rating: 4.6,
-      reviewCount: 18,
-      image: 'https://images.unsplash.com/photo-1545714968-62a0bf2c033d?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Priya S.',
-        avatar: 'https://i.pravatar.cc/150?img=47',
-        rating: 4.7
-      },
-      featured: true
-    },
-    {
-      id: 'default-3',
-      title: 'Drone - DJI Mini 2',
-      description: 'Lightweight drone perfect for aerial photography',
-      price: 650,
-      priceUnit: "day",
-      location: 'HSR Layout, Bangalore',
-      distance: '5.2 km',
-      rating: 4.8,
-      reviewCount: 12,
-      image: 'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Vikram S.',
-        avatar: 'https://i.pravatar.cc/150?img=67',
-        rating: 4.9
-      },
-      featured: true
-    },
-    {
-      id: 'default-4',
-      title: 'Projector - Epson Home Cinema',
-      description: 'Full HD projector for home theater setup',
-      price: 500,
-      priceUnit: "day",
-      location: 'Whitefield, Bangalore',
-      distance: '7.5 km',
-      rating: 4.6,
-      reviewCount: 8,
-      image: 'https://images.unsplash.com/photo-1588416499018-d8c952dc4554?auto=format&fit=crop&q=80&w=1000&h=800',
-      owner: {
-        name: 'Arjun P.',
-        avatar: 'https://i.pravatar.cc/150?img=59',
-        rating: 4.7
-      },
-      featured: true
-    }
-  ];
 };
 
 // Get user's favorites
@@ -380,51 +307,9 @@ export const getFavorites = async (): Promise<any[]> => {
     return [];
   }
   
-  // For MVP, we'll use mock data
-  const mockFavorites = [
-    {
-      id: 'f1',
-      user_id: userData.user.id,
-      listing: {
-        id: 'l3',
-        title: 'Drone - DJI Mini 2',
-        description: 'Lightweight drone perfect for aerial photography',
-        price: 650,
-        priceUnit: 'day',
-        location: 'HSR Layout, Bangalore',
-        image: 'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800',
-        rating: 4.8,
-        reviewCount: 12,
-        owner: {
-          name: 'Vikram S.',
-          avatar: 'https://i.pravatar.cc/150?img=67',
-          rating: 4.9
-        }
-      }
-    },
-    {
-      id: 'f2',
-      user_id: userData.user.id,
-      listing: {
-        id: 'l4',
-        title: 'Projector - Epson Home Cinema',
-        description: 'Full HD projector for home theater setup',
-        price: 500,
-        priceUnit: 'day',
-        location: 'Whitefield, Bangalore',
-        image: 'https://images.unsplash.com/photo-1588416499018-d8c952dc4554?auto=format&fit=crop&q=80&w=1000&h=800',
-        rating: 4.6,
-        reviewCount: 8,
-        owner: {
-          name: 'Arjun P.',
-          avatar: 'https://i.pravatar.cc/150?img=59',
-          rating: 4.7
-        }
-      }
-    }
-  ];
-  
-  return mockFavorites;
+  // For MVP, return an empty array
+  // In a real app, you would query a favorites table
+  return [];
 };
 
 // Toggle favorite status for a listing

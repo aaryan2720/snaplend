@@ -4,9 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import { ReceiptTemplate } from "@/components/receipt/ReceiptTemplate";
 import { confirmStripePayment } from "@/services/stripePaymentService";
 import confetti from "canvas-confetti";
-import { CheckCircle, Download, Printer, Share2 } from "lucide-react";
+import { CheckCircle, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -48,7 +49,7 @@ const PaymentSuccess = () => {
       const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
 
-      const randomInRange = (min, max) => Math.random() * (max - min) + min;
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
       const confettiAnimation = () => {
         confetti({
@@ -147,7 +148,7 @@ const PaymentSuccess = () => {
                   <h3 className="font-medium mb-2 text-snaplend-800">Booking Details</h3>
                   <div className="text-sm text-gray-600 space-y-1">
                     <p>
-                      Booking ID{bookingIds.length > 1 ? 's' : ''}: {bookingIds.join(', ')}
+                      Booking ID{bookingIds?.length > 1 ? 's' : ''}: {bookingIds?.join(', ')}
                     </p>
                     <p>
                       Amount: ₹{totalAmount}
@@ -183,51 +184,16 @@ const PaymentSuccess = () => {
                   </Button>
                 </div>
                 
-                <div className="mt-6">
-                  <ReceiptTemplate
-                    bookingIds={bookingIds}
-                    totalAmount={totalAmount}
-                    paymentIntentId={paymentIntentId || "TXN12345678"}
-                    paymentDate={new Date()}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-center space-x-3 pt-6">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-gray-600"
-                    disabled={!animationComplete}
-                    onClick={() => {
-                      const printWindow = window.open("", "_blank");
-                      if (printWindow) {
-                        printWindow.document.write(document.querySelector(".receipt-template")?.innerHTML || "");
-                        printWindow.document.close();
-                        printWindow.print();
-                      }
-                    }}
-                  >
-                    <Printer className="mr-1 h-4 w-4" />
-                    Print Receipt
-                  </Button>
-                  
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-600"
-                    disabled={!animationComplete}
-                    onClick={() => {
-                      // In a real app, this would open a share dialog
-                      toast({
-                        title: "Share options",
-                        description: "Share dialog would open here.",
-                      });
-                    }}
-                  >
-                    <Share2 className="mr-1 h-4 w-4" />
-                    Share
-                  </Button>
-                </div>
+                {animationComplete && (
+                  <div className="mt-6">
+                    <h3 className="font-medium mb-4 text-gray-800">Receipt</h3>
+                    <ReceiptTemplate 
+                      bookingIds={bookingIds || []}
+                      totalAmount={totalAmount || 0}
+                      paymentIntentId={paymentIntentId || "TXN12345678"}
+                    />
+                  </div>
+                )}
                 
                 <div className="grid grid-cols-2 gap-4 pt-2">
                   <Button 

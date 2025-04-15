@@ -18,137 +18,11 @@ import {
   MapPin,
   BadgeDollarSign,
   Calendar,
-  X
+  X,
+  Loader2
 } from "lucide-react";
-
-// Sample listings data
-const allListings: ListingProps[] = [
-  // ... Featured listings (first 4)
-  {
-    id: "1",
-    title: "Professional DSLR Camera Kit",
-    description: "Canon EOS 5D Mark IV with multiple lenses, perfect for photography enthusiasts or events.",
-    price: 1200,
-    priceUnit: "day",
-    location: "Indiranagar, Bangalore",
-    distance: "2.5 km",
-    rating: 4.9,
-    reviewCount: 47,
-    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=600&h=400",
-    owner: {
-      name: "Priya S.",
-      avatar: "https://i.pravatar.cc/150?img=32",
-      rating: 4.9,
-    },
-    featured: true,
-  },
-  {
-    id: "2",
-    title: "Minimalist Wooden Desk",
-    description: "Beautiful oak desk, perfect for a home office or study space.",
-    price: 500,
-    priceUnit: "week",
-    location: "Koramangala, Bangalore",
-    distance: "4 km",
-    rating: 4.7,
-    reviewCount: 23,
-    image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=600&h=400",
-    owner: {
-      name: "Rahul M.",
-      avatar: "https://i.pravatar.cc/150?img=12",
-      rating: 4.8,
-    },
-    featured: true,
-  },
-  {
-    id: "3",
-    title: "Electric Scooter",
-    description: "Eco-friendly urban mobility solution, perfect for commuting around the city.",
-    price: 300,
-    priceUnit: "day",
-    location: "HSR Layout, Bangalore",
-    distance: "5.2 km",
-    rating: 4.6,
-    reviewCount: 19,
-    image: "https://images.unsplash.com/photo-1558981852-426c6c22a060?auto=format&fit=crop&q=80&w=600&h=400",
-    owner: {
-      name: "Arjun K.",
-      avatar: "https://i.pravatar.cc/150?img=59",
-      rating: 4.7,
-    },
-    featured: true,
-  },
-  {
-    id: "4",
-    title: "Party & Event Sound System",
-    description: "Professional sound system with speakers, mixer and microphones for events.",
-    price: 1500,
-    priceUnit: "day",
-    location: "Whitefield, Bangalore",
-    distance: "7.8 km",
-    rating: 4.8,
-    reviewCount: 34,
-    image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600&h=400",
-    owner: {
-      name: "Neha T.",
-      avatar: "https://i.pravatar.cc/150?img=47",
-      rating: 5.0,
-    },
-    featured: true,
-  },
-  // ... Recommended items (next 6)
-  {
-    id: "5",
-    title: "Mountain Bike - Premium Trek Model",
-    description: "High-quality mountain bike perfect for weekend adventures, well-maintained with front suspension.",
-    price: 600,
-    priceUnit: "week",
-    location: "Jayanagar, Bangalore",
-    distance: "3.7 km",
-    rating: 4.8,
-    reviewCount: 32,
-    image: "https://images.unsplash.com/photo-1552642762-f55d06580015?auto=format&fit=crop&q=80&w=600&h=400",
-    owner: {
-      name: "Vikram S.",
-      avatar: "https://i.pravatar.cc/150?img=33",
-      rating: 4.9,
-    },
-  },
-  {
-    id: "6",
-    title: "Drone with 4K Camera",
-    description: "DJI Mavic Air 2 with 4K camera, perfect for aerial photography and video projects.",
-    price: 800,
-    priceUnit: "day",
-    location: "MG Road, Bangalore",
-    distance: "5.5 km",
-    rating: 4.9,
-    reviewCount: 41,
-    image: "https://images.unsplash.com/photo-1507582020474-9a35b7d455d9?auto=format&fit=crop&q=80&w=600&h=400",
-    owner: {
-      name: "Kiran R.",
-      avatar: "https://i.pravatar.cc/150?img=15",
-      rating: 4.7,
-    },
-  },
-  {
-    id: "7",
-    title: "Projector for Home Cinema",
-    description: "Full HD projector with Bluetooth speakers, perfect for movie nights and presentations.",
-    price: 450,
-    priceUnit: "day",
-    location: "Bellandur, Bangalore",
-    distance: "8.2 km",
-    rating: 4.6,
-    reviewCount: 28,
-    image: "https://images.unsplash.com/photo-1626379953822-baec19c3accd?auto=format&fit=crop&q=80&w=600&h=400",
-    owner: {
-      name: "Anjali P.",
-      avatar: "https://i.pravatar.cc/150?img=19",
-      rating: 4.8,
-    },
-  },
-];
+import { fetchListings } from "@/services/listingService";
+import { useToast } from "@/components/ui/use-toast";
 
 // Available filter options
 const categories = [
@@ -201,6 +75,7 @@ const Explore = () => {
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get("q") || "";
+  const { toast } = useToast();
   
   const [activeView, setActiveView] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -212,9 +87,36 @@ const Explore = () => {
     searchQuery: searchQuery
   });
   
-  const [filteredListings, setFilteredListings] = useState<ListingProps[]>(allListings);
+  const [allListings, setAllListings] = useState<ListingProps[]>([]);
+  const [filteredListings, setFilteredListings] = useState<ListingProps[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const itemsPerPage = 12;
+
+  // Fetch all listings on component mount
+  useEffect(() => {
+    const loadListings = async () => {
+      setIsLoading(true);
+      try {
+        const data = await fetchListings();
+        setAllListings(data);
+        setFilteredListings(data);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load listings. Please try again later.",
+          variant: "destructive"
+        });
+        setAllListings([]);
+        setFilteredListings([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadListings();
+  }, [toast]);
   
   // Filter listings based on the current filter options
   useEffect(() => {
@@ -232,8 +134,10 @@ const Explore = () => {
     
     // Apply category filter
     if (filters.category !== "all") {
-      // In a real app, you would have a category field to filter on
-      // This is just a placeholder implementation
+      // Filter by category if the listing has a category field
+      results = results.filter(listing => 
+        listing.category && listing.category.toLowerCase() === filters.category.toLowerCase()
+      );
     }
     
     // Apply price range filter
@@ -277,7 +181,10 @@ const Explore = () => {
           return distA - distB;
         });
         break;
-      // In a real app, you would have more sorting options based on listing properties
+      case "newest":
+        // In a real app, you'd sort by created_at date
+        results = results;
+        break;
       default:
         // Sort by relevance (featured items first)
         results.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
@@ -285,7 +192,7 @@ const Explore = () => {
     
     setFilteredListings(results);
     setCurrentPage(1); // Reset to first page when filters change
-  }, [filters]);
+  }, [filters, allListings]);
   
   // Update search query when URL params change
   useEffect(() => {
@@ -359,10 +266,7 @@ const Explore = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className={cn(
-                      "rounded-r-none",
-                      activeView === "grid" && "bg-peerly-50"
-                    )}
+                    className={`rounded-r-none ${activeView === "grid" && "bg-peerly-50"}`}
                     onClick={() => setActiveView("grid")}
                   >
                     <List size={16} />
@@ -370,10 +274,7 @@ const Explore = () => {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className={cn(
-                      "rounded-l-none",
-                      activeView === "list" && "bg-peerly-50"
-                    )}
+                    className={`rounded-l-none ${activeView === "list" && "bg-peerly-50"}`}
                     onClick={() => setActiveView("list")}
                   >
                     <Map size={16} />
@@ -543,31 +444,43 @@ const Explore = () => {
               </div>
             )}
             
+            {/* Loading state */}
+            {isLoading && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+                <p className="text-gray-600">Loading listings...</p>
+              </div>
+            )}
+            
             {/* No results message */}
-            {filteredListings.length === 0 && (
+            {!isLoading && filteredListings.length === 0 && (
               <div className="text-center py-12">
                 <div className="w-20 h-20 mx-auto mb-4 flex items-center justify-center bg-peerly-100 rounded-full">
                   <Search size={32} className="text-peerly-400" />
                 </div>
                 <h2 className="text-xl font-medium text-peerly-900 mb-2">No results found</h2>
                 <p className="text-peerly-600 mb-6">
-                  We couldn't find any items matching your criteria. Try adjusting your filters.
+                  We couldn't find any items matching your criteria. Try adjusting your filters or create your own listing.
                 </p>
-                <Button 
-                  variant="outline"
-                  onClick={clearFilters}
-                >
-                  Clear all filters
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button 
+                    variant="outline"
+                    onClick={clearFilters}
+                  >
+                    Clear all filters
+                  </Button>
+                  <Button asChild>
+                    <a href="/create-listing">Create a listing</a>
+                  </Button>
+                </div>
               </div>
             )}
             
             {/* Results grid */}
-            {filteredListings.length > 0 && (
-              <div className={cn(
-                "grid gap-6",
+            {!isLoading && filteredListings.length > 0 && (
+              <div className={`grid gap-6 ${
                 activeView === "grid" ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" : "grid-cols-1"
-              )}>
+              }`}>
                 {currentItems.map(listing => (
                   <ListingCard 
                     key={listing.id} 
@@ -627,10 +540,5 @@ const Explore = () => {
     </div>
   );
 };
-
-// Helper function for className conditionals
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
-}
 
 export default Explore;

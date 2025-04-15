@@ -29,6 +29,9 @@ export const getStorageUrl = (bucket: string, path: string): string => {
     return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/placeholder.jpg`;
   }
   
+  // Remove 'listings/' prefix if present to prevent double prefixing
+  const cleanPath = path.startsWith('listings/') ? path.replace('listings/', '') : path;
+  
   // Return the complete storage URL
-  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
+  return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${cleanPath}`;
 };

@@ -32,20 +32,16 @@ export const initializeSupabase = async () => {
             } else {
               console.log("Created listings bucket successfully");
               
-              // Set CORS policy for the bucket to allow public access
+              // Set CORS policy for the bucket using updateBucket instead of setCorsRules
+              // The CORS settings are now part of the bucket update options
               const { error: corsError } = await supabase.storage.updateBucket('listings', {
                 public: true,
                 allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'],
                 fileSizeLimit: 10 * 1024 * 1024, // 10MB
-                corsRules: [{
-                  allowedOrigins: ['*'],
-                  allowedMethods: ['GET'],
-                  maxAgeSeconds: 3600
-                }]
               });
               
               if (corsError) {
-                console.log("Error setting CORS rules:", corsError.message);
+                console.log("Error setting bucket options:", corsError.message);
               }
             }
           } catch (createBucketError) {

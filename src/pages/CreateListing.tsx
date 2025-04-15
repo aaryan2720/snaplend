@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
-// Categories to choose from
 const categories = [
   { id: "furniture", name: "Furniture", icon: "🪑" },
   { id: "electronics", name: "Electronics", icon: "📱" },
@@ -22,7 +21,6 @@ const categories = [
   { id: "gaming", name: "Gaming", icon: "🎮" },
 ];
 
-// Pricing options
 const pricingOptions = [
   { value: "hour", label: "Per hour" },
   { value: "day", label: "Per day" },
@@ -34,7 +32,6 @@ const CreateListing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Form state
   const [step, setStep] = useState(1);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -48,7 +45,6 @@ const CreateListing = () => {
   
   const totalSteps = 3;
   
-  // Image handling
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -77,7 +73,6 @@ const CreateListing = () => {
     setImages(images.filter(img => img.id !== id));
   };
   
-  // Navigation
   const handleNext = () => {
     if (step < totalSteps) {
       setStep(step + 1);
@@ -92,31 +87,29 @@ const CreateListing = () => {
     }
   };
   
-  // File upload
   const uploadImages = async (): Promise<string[]> => {
     const uploadedUrls: string[] = [];
     
     for (const image of images) {
       if (image.file) {
         const fileExt = image.file.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2, 15)}-${Date.now()}.${fileExt}`;
+        const fileName = `listing-${Date.now()}.${fileExt}`;
         const filePath = `${user?.id}/${fileName}`;
         
-        const { data, error } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('listings')
           .upload(filePath, image.file);
           
-        if (error) {
-          console.error('Error uploading image:', error);
+        if (uploadError) {
+          console.error('Error uploading image:', uploadError);
           toast({
             title: "Upload failed",
-            description: error.message,
+            description: uploadError.message,
             variant: "destructive",
           });
           continue;
         }
         
-        // Get public URL for the uploaded file
         const { data: { publicUrl } } = supabase.storage
           .from('listings')
           .getPublicUrl(filePath);
@@ -128,20 +121,24 @@ const CreateListing = () => {
     return uploadedUrls;
   };
   
-  // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      // Upload images first
+      const { ensureUserProfile } = await import('@/services/profileService');
+      const profileId = await ensureUserProfile();
+      
+      if (!profileId) {
+        throw new Error("Could not create or find user profile");
+      }
+      
       const imageUrls = await uploadImages();
       
-      // Then save listing data
       const { data, error } = await supabase
         .from('listings')
         .insert({
-          owner_id: user?.id,
+          owner_id: profileId,
           title,
           description,
           category,
@@ -159,7 +156,6 @@ const CreateListing = () => {
         description: "Your item has been successfully listed for rent.",
       });
       
-      // Navigate to the newly created listing
       if (data && data[0]?.id) {
         navigate(`/item/${data[0].id}`);
       } else {
@@ -195,7 +191,6 @@ const CreateListing = () => {
             </Link>
           </div>
           
-          {/* Progress indicator */}
           <div className="mb-10">
             <div className="flex items-center justify-between">
               {[...Array(totalSteps)].map((_, index) => (
@@ -254,14 +249,12 @@ const CreateListing = () => {
           
           <form onSubmit={handleSubmit}>
             <div className="glass-card p-6 md:p-8 rounded-xl">
-              {/* Step 1: Item Details */}
               {step === 1 && (
                 <div className="animate-fade-up">
                   <h2 className="text-xl font-medium text-snaplend-900 mb-6">
                     Tell us about your item
                   </h2>
                   
-                  {/* Title */}
                   <div className="mb-6">
                     <label htmlFor="title" className="block text-sm font-medium text-snaplend-700 mb-1">
                       Title <span className="text-red-500">*</span>
@@ -280,7 +273,6 @@ const CreateListing = () => {
                     </p>
                   </div>
                   
-                  {/* Description */}
                   <div className="mb-6">
                     <label htmlFor="description" className="block text-sm font-medium text-snaplend-700 mb-1">
                       Description <span className="text-red-500">*</span>
@@ -299,7 +291,6 @@ const CreateListing = () => {
                     </p>
                   </div>
                   
-                  {/* Category */}
                   <div>
                     <label className="block text-sm font-medium text-snaplend-700 mb-1">
                       Category <span className="text-red-500">*</span>
@@ -326,7 +317,6 @@ const CreateListing = () => {
                 </div>
               )}
               
-              {/* Step 2: Photos */}
               {step === 2 && (
                 <div className="animate-fade-up">
                   <h2 className="text-xl font-medium text-snaplend-900 mb-6">
@@ -402,14 +392,12 @@ const CreateListing = () => {
                 </div>
               )}
               
-              {/* Step 3: Location & Pricing */}
               {step === 3 && (
                 <div className="animate-fade-up">
                   <h2 className="text-xl font-medium text-snaplend-900 mb-6">
                     Set your location and pricing
                   </h2>
                   
-                  {/* Location */}
                   <div className="mb-6">
                     <label htmlFor="address" className="block text-sm font-medium text-snaplend-700 mb-1">
                       Pickup location <span className="text-red-500">*</span>
@@ -431,7 +419,6 @@ const CreateListing = () => {
                     </p>
                   </div>
                   
-                  {/* Pricing */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                       <label htmlFor="price" className="block text-sm font-medium text-snaplend-700 mb-1">
@@ -472,7 +459,6 @@ const CreateListing = () => {
                     </div>
                   </div>
                   
-                  {/* Security deposit */}
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-1">
                       <label htmlFor="deposit" className="block text-sm font-medium text-snaplend-700">
@@ -502,7 +488,6 @@ const CreateListing = () => {
                     </p>
                   </div>
                   
-                  {/* Terms agreement */}
                   <div className="mb-6">
                     <div className="flex items-start">
                       <input
@@ -522,7 +507,6 @@ const CreateListing = () => {
                 </div>
               )}
               
-              {/* Navigation buttons */}
               <div className="flex justify-between mt-8">
                 {step > 1 ? (
                   <Button

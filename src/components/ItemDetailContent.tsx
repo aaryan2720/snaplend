@@ -1,12 +1,13 @@
 
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React from "react";
 import { ListingProps } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
+import { ShoppingCart, Star, Heart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
+import ImageGallery from "@/components/ImageGallery";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { getStorageUrl } from "@/integrations/supabase/client";
 
 interface ItemDetailContentProps {
   listing: ListingProps;
@@ -15,149 +16,71 @@ interface ItemDetailContentProps {
 const ItemDetailContent: React.FC<ItemDetailContentProps> = ({ listing }) => {
   const { addToCart } = useCart();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(listing.image);
-  
-  // Extract additional images from the listing if available
-  const additionalImages = listing.additionalImages || [];
-  const allImages = [listing.image, ...additionalImages].filter(Boolean);
-  
+
   const handleAddToCart = () => {
     addToCart(listing);
     toast({
       title: "Added to cart",
-      description: `${listing.title} has been added to your cart.`
+      description: "Item added to your cart successfully.",
     });
   };
-  
-  const handleRentNow = () => {
-    if (!user) {
-      toast({
-        title: "Login required",
-        description: "Please login to rent this item"
-      });
-      navigate("/login", { state: { returnTo: `/item/${listing.id}` } });
-      return;
-    }
-    
-    addToCart(listing);
-    navigate("/checkout");
-  };
-  
+
+  const { user } = useAuth();
+  // Safely check if the user is the owner by checking for both IDs
+  const isOwner = user?.id && listing.owner?.id && user.id === listing.owner.id;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-      {/* Image Gallery */}
-      <div>
-        <div className="rounded-2xl overflow-hidden bg-gray-100 mb-4 aspect-square">
-          <img 
-            src={selectedImage} 
-            alt={listing.title} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="grid grid-cols-4 gap-4">
-          {allImages.length > 0 ? (
-            allImages.slice(0, 4).map((img, i) => (
-              <div 
-                key={i} 
-                className="rounded-lg overflow-hidden bg-gray-100 aspect-square cursor-pointer"
-                onClick={() => setSelectedImage(img)}
-              >
-                <img 
-                  src={img} 
-                  alt={`${listing.title} - view ${i+1}`} 
-                  className={`w-full h-full object-cover transition ${selectedImage === img ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
-                />
-              </div>
-            ))
-          ) : (
-            // Fallback if no images
-            [...Array(4)].map((_, i) => (
-              <div key={i} className="rounded-lg overflow-hidden bg-gray-100 aspect-square">
-                <img 
-                  src={listing.image} 
-                  alt={`${listing.title} - view ${i+1}`} 
-                  className="w-full h-full object-cover opacity-60 hover:opacity-100 transition"
-                />
-              </div>
-            ))
-          )}
-        </div>
+    <div>
+      <div className="mb-8">
+        <ImageGallery images={listing.additionalImages || []} mainImage={listing.image} />
       </div>
-      
-      {/* Item Details */}
-      <div>
-        <h1 className="text-3xl font-bold mb-2">{listing.title}</h1>
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-amber-500 flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-              </svg>
-            ))}
-          </span>
-          <span className="text-gray-600">{listing.rating} ({listing.reviewCount} reviews)</span>
+
+      <div className="md:grid md:grid-cols-2 md:gap-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{listing.title}</h1>
+          <div className="flex items-center mb-4">
+            <Star className="text-yellow-500 mr-1" size={20} />
+            <span className="text-gray-700 font-medium">{listing.rating.toFixed(1)}</span>
+            <span className="text-gray-500 ml-2">({listing.reviewCount} reviews)</span>
+          </div>
+          <div className="mb-4">
+            <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+              {listing.category}
+            </span>
+          </div>
+          <p className="text-gray-700 mb-6">{listing.description}</p>
         </div>
-        
-        <div className="mb-6">
-          <span className="text-3xl font-bold">₹{listing.price}</span>
-          <span className="text-gray-600">/{listing.priceUnit}</span>
-        </div>
-        
-        <div className="mb-8">
-          <h2 className="font-semibold text-lg mb-2">Description</h2>
-          <p className="text-gray-600 whitespace-pre-line">{listing.description}</p>
-        </div>
-        
-        <div className="mb-8">
-          <h2 className="font-semibold text-lg mb-2">Owner</h2>
-          <div className="flex items-center gap-3">
-            <img 
-              src={listing.owner.avatar} 
-              alt={listing.owner.name} 
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <div>
-              <p className="font-medium">{listing.owner.name}</p>
-              <div className="flex items-center text-amber-500">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
-                  </svg>
-                ))}
-                <span className="ml-1 text-gray-600 text-sm">{listing.owner.rating}</span>
+
+        <div>
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Rental Details</h2>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-gray-700">Price per day:</span>
+              <span className="font-medium text-gray-900">₹{listing.price}</span>
+            </div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-gray-700">Location:</span>
+              <span className="font-medium text-gray-900">{listing.location}</span>
+            </div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-gray-700">Owner:</span>
+              <div className="flex items-center">
+                <img src={listing.owner.avatar} alt={listing.owner.name} className="w-8 h-8 rounded-full mr-2" />
+                <span className="font-medium text-gray-900">{listing.owner.name}</span>
               </div>
             </div>
+            {isOwner ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                <p className="text-amber-800 font-medium">This is your listing</p>
+                <p className="text-amber-700 text-sm mt-1">You cannot rent your own items.</p>
+              </div>
+            ) : (
+              <Button onClick={handleAddToCart} className="w-full md:w-auto">
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Add to Cart
+              </Button>
+            )}
           </div>
-        </div>
-        
-        <div className="mb-8">
-          <h2 className="font-semibold text-lg mb-2">Location</h2>
-          <p className="text-gray-600">{listing.location}</p>
-          
-          {/* Map placeholder - could be replaced with an actual map */}
-          <div className="mt-2 rounded-lg overflow-hidden bg-gray-100 h-48 flex items-center justify-center">
-            <span className="text-gray-500">Map view will be shown here</span>
-          </div>
-        </div>
-        
-        <div className="flex flex-col md:flex-row gap-4">
-          <Button 
-            onClick={handleRentNow}
-            className="flex-1 py-6"
-            size="lg"
-          >
-            Rent Now
-          </Button>
-          <Button 
-            onClick={handleAddToCart}
-            variant="outline" 
-            className="flex-1 py-6"
-            size="lg"
-          >
-            Add to Cart
-          </Button>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { markListingAsSold } from "@/services/listingService";
 
 export interface BookingPayload {
   listing_id: string;
@@ -53,6 +54,9 @@ export const createBooking = async (bookingData: BookingPayload): Promise<string
     console.error("Error creating booking:", error);
     throw error;
   }
+
+  // Mark the listing as sold when booked
+  await markListingAsSold(bookingData.listing_id);
 
   return data.id;
 };

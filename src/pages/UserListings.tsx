@@ -38,6 +38,20 @@ const UserListings = () => {
 
     fetchListings();
   }, [user, toast]);
+  
+  // Handle listing deletion to refresh the list after a listing is deleted
+  const handleDeletedListing = () => {
+    if (user) {
+      // Refresh listings after deletion
+      getUserListings(user.id).then(updatedListings => {
+        setListings(updatedListings);
+        toast({
+          title: "Success",
+          description: "Your listing has been deleted",
+        });
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -74,26 +88,11 @@ const UserListings = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {listings.map((listing: any) => (
+            {listings.map((listing) => (
               <ListingCard 
                 key={listing.id}
-                listing={{
-                  id: listing.id,
-                  title: listing.title,
-                  description: listing.description,
-                  price: listing.price,
-                  priceUnit: listing.priceUnit || "day",
-                  location: listing.location,
-                  distance: "Near you",
-                  image: listing.image_urls?.[0] || "/placeholder.svg",
-                  rating: 4.5,
-                  reviewCount: 0,
-                  owner: {
-                    name: "You",
-                    avatar: "/placeholder.svg",
-                    rating: 5
-                  }
-                }}
+                listing={listing}
+                onDelete={handleDeletedListing}
               />
             ))}
           </div>
