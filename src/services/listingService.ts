@@ -1,3 +1,4 @@
+
 import { supabase, getStorageUrl } from "@/integrations/supabase/client";
 import { ListingProps, Owner } from "@/components/ListingCard";
 import { getDefaultAvatar } from "@/services/profileService";
@@ -53,7 +54,7 @@ const mapDbListingToFrontend = (dbListing: any): ListingProps => {
   };
 
   // Process image URLs with more robust handling
-  let imageUrl = "https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800";
+  let imageUrl = "/placeholder.svg";
   
   if (dbListing.image_urls && dbListing.image_urls.length > 0) {
     const firstImage = dbListing.image_urls[0];
@@ -77,7 +78,7 @@ const mapDbListingToFrontend = (dbListing: any): ListingProps => {
     title: dbListing.title,
     description: dbListing.description,
     price: dbListing.price,
-    priceUnit: "day" as "hour" | "day" | "week" | "month", // Ensure type is correct
+    priceUnit: dbListing.priceUnit || "day", // Default to "day" if not specified
     location: dbListing.location,
     distance: "Near you", // This would need to be calculated based on user's location
     rating: 0, // Default value for rating is always 0
@@ -114,8 +115,12 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
       return [];
     }
 
+    if (!data || data.length === 0) {
+      return [];
+    }
+
     // Important fix: Cast to any and break the type chain before mapping
-    return (data || []).map((item: any) => mapDbListingToFrontend(item)) as ListingProps[];
+    return data.map((item: any) => mapDbListingToFrontend(item));
   } catch (err) {
     console.error("Exception fetching listings:", err);
     return [];
@@ -141,6 +146,10 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
 
     if (error) {
       console.error(`Error fetching listing with ID ${id}:`, error);
+      return null;
+    }
+
+    if (!data) {
       return null;
     }
 
@@ -252,36 +261,7 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
     }
 
     if (!data || data.length === 0) {
-      // Return mock data for now if no real data exists
-      const mockData = [
-        {
-          id: 'l1',
-          title: 'Professional DSLR Camera Kit',
-          description: 'Canon EOS 5D Mark IV with lenses and accessories',
-          price: 1200,
-          priceUnit: 'day',
-          location: 'Indiranagar, Bangalore',
-          image_urls: ['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1000&h=800'],
-          created_at: new Date().toISOString(),
-          category: 'electronics',
-          is_sold: false
-        },
-        {
-          id: 'l2',
-          title: 'Mountain Bike - Trek X-Caliber 8',
-          description: 'Perfect for trails and off-road adventures',
-          price: 450,
-          priceUnit: 'day',
-          location: 'Koramangala, Bangalore',
-          image_urls: ['https://images.unsplash.com/photo-1545714968-62a0bf2c033d?auto=format&fit=crop&q=80&w=1000&h=800'],
-          created_at: new Date().toISOString(),
-          category: 'sports',
-          is_sold: false
-        }
-      ];
-      
-      // Important fix: Cast mock data item to any and make sure TypeScript doesn't track type relationship chains
-      return mockData.map(item => mapDbListingToFrontend(item as any));
+      return [];
     }
 
     // Important fix: Break the type chain by explicitly casting each item to any
@@ -292,7 +272,7 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
   }
 };
 
-// Completely rewritten to fix TypeScript "excessively deep" error
+// Fetch featured listings
 export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
   try {
     // Make direct SQL query to avoid TypeScript tracking relationships between tables
@@ -300,7 +280,7 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
     
     if (error || !data || data.length === 0) {
       console.error("Error or empty result fetching featured listings:", error);
-      return getDefaultListings();
+      return [];
     }
     
     // Process results as simple objects without type relationships
@@ -321,13 +301,8 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
     });
   } catch (err) {
     console.error("Exception fetching featured listings:", err);
-    return getDefaultListings();
+    return [];
   }
-};
-
-// Provide default listings when needed
-export const getDefaultListings = (): ListingProps[] => {
-  return [];
 };
 
 // Get user's favorites
@@ -338,51 +313,9 @@ export const getFavorites = async (): Promise<any[]> => {
     return [];
   }
   
-  // For MVP, we'll use mock data
-  const mockFavorites = [
-    {
-      id: 'f1',
-      user_id: userData.user.id,
-      listing: {
-        id: 'l3',
-        title: 'Drone - DJI Mini 2',
-        description: 'Lightweight drone perfect for aerial photography',
-        price: 650,
-        priceUnit: 'day',
-        location: 'HSR Layout, Bangalore',
-        image: 'https://images.unsplash.com/photo-1579829366248-204fe8413f31?auto=format&fit=crop&q=80&w=1000&h=800',
-        rating: 0,
-        reviewCount: 0,
-        owner: {
-          name: 'Vikram S.',
-          avatar: 'https://i.pravatar.cc/150?img=67',
-          rating: 0
-        }
-      }
-    },
-    {
-      id: 'f2',
-      user_id: userData.user.id,
-      listing: {
-        id: 'l4',
-        title: 'Projector - Epson Home Cinema',
-        description: 'Full HD projector for home theater setup',
-        price: 500,
-        priceUnit: 'day',
-        location: 'Whitefield, Bangalore',
-        image: 'https://images.unsplash.com/photo-1588416499018-d8c952dc4554?auto=format&fit=crop&q=80&w=1000&h=800',
-        rating: 0,
-        reviewCount: 0,
-        owner: {
-          name: 'Arjun P.',
-          avatar: 'https://i.pravatar.cc/150?img=59',
-          rating: 0
-        }
-      }
-    }
-  ];
-  
-  return mockFavorites;
+  // For MVP, return an empty array
+  // In a real app, you would query a favorites table
+  return [];
 };
 
 // Toggle favorite status for a listing

@@ -188,10 +188,10 @@ const FeaturedListings = () => {
       setLoading(true);
       try {
         const listings = await fetchFeaturedListings();
-        setFeaturedListings(listings.length > 0 ? listings : getDefaultFeaturedListings());
+        setFeaturedListings(listings);
       } catch (error) {
         console.error("Error loading featured listings:", error);
-        setFeaturedListings(getDefaultFeaturedListings());
+        setFeaturedListings([]);
       } finally {
         setLoading(false);
       }
@@ -199,84 +199,6 @@ const FeaturedListings = () => {
     
     loadFeaturedListings();
   }, []);
-  
-  // Sample featured listings data as fallback
-  const getDefaultFeaturedListings = (): ListingProps[] => {
-    return [
-      {
-        id: "1",
-        title: "Professional DSLR Camera Kit",
-        description: "Canon EOS 5D Mark IV with multiple lenses, perfect for photography enthusiasts or events.",
-        price: 1200,
-        priceUnit: "day",
-        location: "Indiranagar, Bangalore",
-        distance: "2.5 km",
-        rating: 4.9,
-        reviewCount: 47,
-        image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=600&h=400",
-        owner: {
-          name: "Priya S.",
-          avatar: "https://i.pravatar.cc/150?img=32",
-          rating: 4.9,
-        },
-        featured: true,
-      },
-      {
-        id: "2",
-        title: "Minimalist Wooden Desk",
-        description: "Beautiful oak desk, perfect for a home office or study space.",
-        price: 500,
-        priceUnit: "week",
-        location: "Koramangala, Bangalore",
-        distance: "4 km",
-        rating: 4.7,
-        reviewCount: 23,
-        image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=600&h=400",
-        owner: {
-          name: "Rahul M.",
-          avatar: "https://i.pravatar.cc/150?img=12",
-          rating: 4.8,
-        },
-        featured: true,
-      },
-      {
-        id: "3",
-        title: "Electric Scooter",
-        description: "Eco-friendly urban mobility solution, perfect for commuting around the city.",
-        price: 300,
-        priceUnit: "day",
-        location: "HSR Layout, Bangalore",
-        distance: "5.2 km",
-        rating: 4.6,
-        reviewCount: 19,
-        image: "https://images.unsplash.com/photo-1558981852-426c6c22a060?auto=format&fit=crop&q=80&w=600&h=400",
-        owner: {
-          name: "Arjun K.",
-          avatar: "https://i.pravatar.cc/150?img=59",
-          rating: 4.7,
-        },
-        featured: true,
-      },
-      {
-        id: "4",
-        title: "Party & Event Sound System",
-        description: "Professional sound system with speakers, mixer and microphones for events.",
-        price: 1500,
-        priceUnit: "day",
-        location: "Whitefield, Bangalore",
-        distance: "7.8 km",
-        rating: 4.8,
-        reviewCount: 34,
-        image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600&h=400",
-        owner: {
-          name: "Neha T.",
-          avatar: "https://i.pravatar.cc/150?img=47",
-          rating: 5.0,
-        },
-        featured: true,
-      },
-    ];
-  };
   
   // Animation variants for section elements
   const sectionVariants = {
@@ -303,6 +225,53 @@ const FeaturedListings = () => {
             <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
             <p className="text-gray-600">Loading featured listings...</p>
           </div>
+        </Container>
+      </section>
+    );
+  }
+
+  if (featuredListings.length === 0) {
+    return (
+      <section className="py-16 md:py-24 relative overflow-hidden bg-gradient-to-b from-snaplend-50/90 to-white">
+        <Container>
+          <motion.div
+            className="max-w-5xl mx-auto text-center"
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <motion.div 
+              className="mb-16"
+              variants={headerVariants}
+            >
+              <Badge className="mb-4 px-4 py-1.5 bg-primary/10 text-primary rounded-full font-medium inline-flex items-center gap-1">
+                <TrendingUp size={14} className="text-primary" />
+                <span>Top Listings</span>
+              </Badge>
+              
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 leading-tight">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">
+                  Featured
+                </span>{" "}
+                rentals
+              </h2>
+              
+              <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+                No featured listings available yet. Be the first to create a listing!
+              </p>
+              
+              <Link to="/create-listing">
+                <motion.button
+                  className="mt-8 px-6 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors font-medium"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Create Listing
+                </motion.button>
+              </Link>
+            </motion.div>
+          </motion.div>
         </Container>
       </section>
     );
@@ -391,17 +360,19 @@ const FeaturedListings = () => {
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
         >
-          <motion.button
-            className="group px-8 py-3.5 bg-gradient-to-r from-primary to-purple-600 text-white rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 font-medium flex items-center gap-2 mx-auto"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <span>View all listings</span>
-            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </motion.button>
+          <Link to="/explore">
+            <motion.button
+              className="group px-8 py-3.5 bg-gradient-to-r from-primary to-purple-600 text-white rounded-full hover:shadow-lg hover:shadow-primary/20 transition-all duration-300 font-medium flex items-center gap-2 mx-auto"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span>View all listings</span>
+              <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </Link>
           
           <p className="mt-4 text-sm text-gray-500">
-            Explore over 2,000+ high-quality items available for rent
+            Explore available high-quality items for rent
           </p>
         </motion.div>
       </Container>
