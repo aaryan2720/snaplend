@@ -38,7 +38,6 @@ interface DbListing {
     id: string;
     full_name: string | null;
     avatar_url: string | null;
-    gender?: string;
   } | null;
 }
 
@@ -48,9 +47,8 @@ const mapDbListingToFrontend = (dbListing: any): ListingProps => {
   const owner: Owner = {
     id: dbListing.profiles?.id,
     name: dbListing.profiles?.full_name || "Anonymous User",
-    avatar: dbListing.profiles?.avatar_url || getDefaultAvatar(dbListing.profiles?.gender),
+    avatar: dbListing.profiles?.avatar_url || getDefaultAvatar(),
     rating: 0, // Default rating is always 0
-    gender: dbListing.profiles?.gender
   };
 
   // Process image URLs with more robust handling
@@ -104,8 +102,7 @@ export const fetchListings = async (): Promise<ListingProps[]> => {
         profiles:owner_id (
           id,
           full_name,
-          avatar_url,
-          gender
+          avatar_url
         )
       `)
       .eq('is_active', true);
@@ -137,8 +134,7 @@ export const fetchListingById = async (id: string): Promise<ListingProps | null>
         profiles:owner_id (
           id,
           full_name,
-          avatar_url,
-          gender
+          avatar_url
         )
       `)
       .eq('id', id)
@@ -249,8 +245,7 @@ export const getUserListings = async (userId: string): Promise<ListingProps[]> =
         profiles:owner_id (
           id,
           full_name,
-          avatar_url,
-          gender
+          avatar_url
         )
       `)
       .eq('owner_id', userId);
@@ -291,8 +286,7 @@ export const fetchFeaturedListings = async (): Promise<ListingProps[]> => {
         profiles: rawItem.profile_id ? {
           id: rawItem.profile_id,
           full_name: rawItem.profile_name,
-          avatar_url: rawItem.profile_avatar,
-          gender: rawItem.profile_gender
+          avatar_url: rawItem.profile_avatar
         } : null
       });
       
